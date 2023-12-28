@@ -7,19 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E78457B2B3CC2470049D31E /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E78457A2B3CC2470049D31E /* DateHelper.swift */; };
+		1E78457D2B3CCADE0049D31E /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E78457C2B3CCADE0049D31E /* Entry.swift */; };
 		1E8401C32AC3427A0034B181 /* logApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8401C22AC3427A0034B181 /* logApp.swift */; };
-		1E8401C52AC3427A0034B181 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8401C42AC3427A0034B181 /* ContentView.swift */; };
+		1E8401C52AC3427A0034B181 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8401C42AC3427A0034B181 /* MainView.swift */; };
 		1E8401C72AC3427B0034B181 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E8401C62AC3427B0034B181 /* Assets.xcassets */; };
 		1E8401CB2AC3427B0034B181 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E8401CA2AC3427B0034B181 /* Preview Assets.xcassets */; };
+		1EC4A8FD2B1AA8D7003C26A5 /* StorageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1E78457A2B3CC2470049D31E /* DateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateHelper.swift; sourceTree = "<group>"; };
+		1E78457C2B3CCADE0049D31E /* Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
 		1E8401BF2AC3427A0034B181 /* log.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = log.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E8401C22AC3427A0034B181 /* logApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = logApp.swift; sourceTree = "<group>"; };
-		1E8401C42AC3427A0034B181 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1E8401C42AC3427A0034B181 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		1E8401C62AC3427B0034B181 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1E8401C82AC3427B0034B181 /* log.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = log.entitlements; sourceTree = "<group>"; };
 		1E8401CA2AC3427B0034B181 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		1EBCAC962B1A9FEA0034CDD5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,8 +59,12 @@
 		1E8401C12AC3427A0034B181 /* log */ = {
 			isa = PBXGroup;
 			children = (
+				1EBCAC962B1A9FEA0034CDD5 /* Info.plist */,
 				1E8401C22AC3427A0034B181 /* logApp.swift */,
-				1E8401C42AC3427A0034B181 /* ContentView.swift */,
+				1E8401C42AC3427A0034B181 /* MainView.swift */,
+				1E78457C2B3CCADE0049D31E /* Entry.swift */,
+				1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */,
+				1E78457A2B3CC2470049D31E /* DateHelper.swift */,
 				1E8401C62AC3427B0034B181 /* Assets.xcassets */,
 				1E8401C82AC3427B0034B181 /* log.entitlements */,
 				1E8401C92AC3427B0034B181 /* Preview Content */,
@@ -139,8 +150,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1E8401C52AC3427A0034B181 /* ContentView.swift in Sources */,
+				1E78457D2B3CCADE0049D31E /* Entry.swift in Sources */,
+				1E8401C52AC3427A0034B181 /* MainView.swift in Sources */,
+				1E78457B2B3CC2470049D31E /* DateHelper.swift in Sources */,
 				1E8401C32AC3427A0034B181 /* logApp.swift in Sources */,
+				1EC4A8FD2B1AA8D7003C26A5 /* StorageHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,7 +213,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -254,7 +270,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -264,16 +282,19 @@
 		1E8401CF2AC3427B0034B181 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = log/log.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"log/Preview Content\"";
 				DEVELOPMENT_TEAM = A44UN86BN6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = log/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = log;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -288,11 +309,12 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = store.xno.log;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = chris.logapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -302,16 +324,19 @@
 		1E8401D02AC3427B0034B181 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = log/log.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "\"log/Preview Content\"";
 				DEVELOPMENT_TEAM = A44UN86BN6;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = log/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = log;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -326,11 +351,12 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.6;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = store.xno.log;
+				MARKETING_VERSION = 1.0.2;
+				PRODUCT_BUNDLE_IDENTIFIER = chris.logapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
