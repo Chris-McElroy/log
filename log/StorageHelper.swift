@@ -74,7 +74,6 @@ class Storage: ObservableObject {
     func set(_ entry: Entry, at time: Int) {
         pullData()
         let timeString = "g" + String(time)
-        print("old:", data[DateHelper.main.day]?[timeString] ?? "no previous entry")
         if entry.isEmpty() {
             data[DateHelper.main.day]?[timeString] = nil
         } else {

@@ -28,11 +28,8 @@ struct MainView: View {
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
                 let w = drag.translation.width // no need for height because the scroll view overrides
-                print(w)
-                if w < 0 && abs(w) > 10 {
-//                    dateHelper
-//                    storage.entries = MainView.loadAndGetEntries()
-                }
+                dateHelper.changeDay(forward: w < 0) // could add in limit for small w but that seems to already be filtered
+                storage.loadEntries()
             }
         )
     }
@@ -48,9 +45,7 @@ struct MainView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(dateHelper.times, id: \.self) { time in
-                        EntrySummaryView(entry: storage.entries[time] ?? Entry(""),
-                                         time: time,
-                                         isCurrentTime: time == dateHelper.currentTimeSlot())
+                        EntrySummaryView(entry: storage.entries[time] ?? Entry(""), time: time)
                     }
                 }
                 .onAppear {

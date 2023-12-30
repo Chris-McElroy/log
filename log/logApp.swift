@@ -21,7 +21,7 @@ struct logApp: App {
                     Storage.main.loadEntries()
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                    ScrollHelper.main.focusTimeSlot = DateHelper.main.currentTimeSlot()
+                    ScrollHelper.main.focusTimeSlot = DateHelper.main.getCurrentTimeSlot()
                     ScrollHelper.main.mainViewScrollProxy?.scrollTo(ScrollHelper.main.focusTimeSlot, anchor: .top)
                 }
             // TODO force restart MainView when calendar (ie time zone) changes

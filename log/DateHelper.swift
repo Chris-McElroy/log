@@ -13,17 +13,23 @@ class DateHelper: ObservableObject {
     @Published var day: String
     @Published var times: [Int] = []
     @Published var hourStrings: [Int: String] = [:]
-    private var dayRef: Double = UserDefaults.standard.value(forKey: "day") as? Double ?? Date.now.timeIntervalSinceReferenceDate
+    @Published var currentTimeSlot: Int? = nil
+    private var dateRef: DateComponents
     
     init() {
-        day = DateHelper.dayString(for: Date(timeIntervalSinceReferenceDate: dayRef))
-        UserDefaults.standard.setValue(dayRef, forKey: "day")
+        let year = UserDefaults.standard.value(forKey: "year") as? Int ?? 2024
+        let month = UserDefaults.standard.value(forKey: "month") as? Int ?? 1
+        let day = UserDefaults.standard.value(forKey: "day") as? Int ?? 1
+        
+        let dateRef = DateComponents(year: year, month: month, day: day)
+        
+        self.dateRef = dateRef
+        self.day = DateHelper.dayString(from: dateRef)
     }
 
-    static func dayString(for date: Date = .now) -> String {
-        let comp = Calendar.current.dateComponents([.year, .month, .day], from: date)
-        let yearString = String((comp.year ?? 1997) - 1997)
-        return "," + yearString + "." + String(comp.month ?? 0) + "." + String(comp.day ?? 0)
+    static func dayString(from date: DateComponents) -> String {
+        let yearString = String((date.year ?? 2024) - 1997)
+        return yearString + "." + String(date.month ?? 1) + "." + String(date.day ?? 1)
     }
     
     private static func timeZoneOffset() -> Int {
@@ -31,8 +37,14 @@ class DateHelper: ObservableObject {
     }
     
     func changeDay(forward: Bool) {
-//        dayRef +=
-        // use https://developer.apple.com/documentation/foundation/datecomponents/1780435-isvaliddate
+        let dateRefDate = Calendar.current.date(from: dateRef) ?? .now
+        let newDate = Calendar.current.date(byAdding: .day, value: forward ? 1 : -1, to: dateRefDate) ?? .now
+        dateRef = Calendar.current.dateComponents([.year, .month, .day], from: newDate)
+        day = DateHelper.dayString(from: dateRef)
+        
+        UserDefaults.standard.setValue(dateRef.year ?? 2024, forKey: "year")
+        UserDefaults.standard.setValue(dateRef.month ?? 1, forKey: "month")
+        UserDefaults.standard.setValue(dateRef.day ?? 1, forKey: "day")
     }
     
     func loadTimes(lo: Int?, hi: Int?) {
@@ -40,21 +52,31 @@ class DateHelper: ObservableObject {
         let lo = min(-offset, lo ?? -offset)
         let hi = max(108000-offset, hi ?? 108000-offset)
         
-        times = []
+        var tempTimes: [Int] = []
         
         var i = lo
         while i <= hi {
-            times.append(i)
+            tempTimes.append(i)
             i += 900
         }
         
-        hourStrings = [:]
+        var tempHourStrings: [Int: String] = [:]
         
-        for time in times {
+        for time in tempTimes {
             if (time + offset) % 3600 == 0 {
-                hourStrings[time] = "," + String((time + offset)/3600)
+                tempHourStrings[time] = "," + String((time + offset)/3600)
             }
         }
+        
+        times = tempTimes
+        hourStrings = tempHourStrings
+        currentTimeSlot = getCurrentTimeSlot()
+        let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: 0), matchingPolicy: .nextTime) ?? .now
+        
+        let slotTimer = Timer.init(fire: nextSlotTime, interval: 900, repeats: true, block: { _ in
+            self.currentTimeSlot = self.getCurrentTimeSlot()
+        })
+        RunLoop.current.add(slotTimer, forMode: .common)
     }
     
     func getTimeString(start: Int, duration: Int) -> String {
@@ -72,23 +94,26 @@ class DateHelper: ObservableObject {
         return startString + " - " + endString
     }
     
-    func currentTimeSlot() -> Int? {
+    func getCurrentTimeSlot() -> Int? {
         let now = Date.now
-        let todayString = DateHelper.dayString(for: now)
+        let todayRef = Calendar.current.dateComponents([.year, .month, .day], from: now)
         
         let currentTimeToday = (Int(now.timeIntervalSince(Calendar.current.startOfDay(for: now))) - DateHelper.timeZoneOffset())/900*900
         
-        if day == todayString {
+        if dateRef == todayRef {
             return currentTimeToday
         }
         
-        let tomorrow = DateHelper.dayString(for: now.addingTimeInterval(86400))
-        if day == tomorrow {
+        
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? .now
+        let tomorrowRef = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow)
+        if dateRef == tomorrowRef {
             return currentTimeToday - 86400
         }
         
-        let yesterday = DateHelper.dayString(for: now.addingTimeInterval(-86400))
-        if day == yesterday {
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: now) ?? .now
+        let yesterdayRef = Calendar.current.dateComponents([.year, .month, .day], from: yesterday)
+        if dateRef == yesterdayRef {
             return currentTimeToday + 86400
         }
         

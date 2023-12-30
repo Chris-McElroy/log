@@ -10,23 +10,21 @@ import SwiftUI
 struct EntrySummaryView: View {
     @ObservedObject var entry: Entry
     @State var time: Int
-    @State var isCurrentTime: Bool
-    
-    
+    @ObservedObject var dateHelper: DateHelper = DateHelper.main
     
     var body: some View {
         VStack(spacing: 0) {
             Color.white
-                .frame(height: DateHelper.main.hourStrings[time] != nil ? 2 : 1)
+                .frame(height: dateHelper.hourStrings[time] != nil ? 2 : 1)
             HStack(spacing: 0) {
                 ZStack {
-                    if isCurrentTime {
+                    if time == dateHelper.currentTimeSlot {
                         Color.white
-                        Text(DateHelper.main.hourStrings[time] ?? "")
+                        Text(dateHelper.hourStrings[time] ?? "")
                             .foregroundStyle(Color.black)
                     } else {
                         Color.black
-                        Text(DateHelper.main.hourStrings[time] ?? "")
+                        Text(dateHelper.hourStrings[time] ?? "")
                             .foregroundStyle(Color.white)
                     }
                 }
