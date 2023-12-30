@@ -12,14 +12,19 @@ struct logApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                    currentSlot = Int(Date.now.timeIntervalSince(Calendar.current.startOfDay(for: .now))/900)
-                    scrollProxy?.scrollTo(currentSlot, anchor: .center)
-                }
-                .onAppear {
-                    Storage.main.pullData()
-                }
+                .padding(.bottom, 1)
                 .font(Font.custom("Baskerville", size: 14.0))
+//                .foregroundStyle(Color.white) // this was making everything error out?
+                .background(Color.black, ignoresSafeAreaEdges: .all)
+            
+                .onAppear {
+                    Storage.main.loadEntries()
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    ScrollHelper.main.focusTimeSlot = DateHelper.main.currentTimeSlot()
+                    ScrollHelper.main.mainViewScrollProxy?.scrollTo(ScrollHelper.main.focusTimeSlot, anchor: .top)
+                }
+            // TODO force restart MainView when calendar (ie time zone) changes
         }
     }
 }

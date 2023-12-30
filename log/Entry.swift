@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct Entry {
-    var text: String = ""
-    var colors: [Int] = []
-    var duration = 1
+class Entry: ObservableObject, Equatable {
+    @Published var text: String = ""
+    @Published var colors: [Int] = []
+    @Published var duration = 1
     
     init(_ text: String) {
         self.text = text
@@ -25,6 +25,14 @@ struct Entry {
             self.colors = colors.compactMap { $0 as? Int }
         }
         duration = entryData["d"] as? Int ?? 1
+    }
+    
+    static func == (lhs: Entry, rhs: Entry) -> Bool {
+        lhs.text == rhs.text && lhs.colors == rhs.colors && lhs.duration == rhs.duration
+    }
+    
+    func isEmpty() -> Bool {
+        text == "" && colors.isEmpty && duration == 1
     }
     
     func toDict() -> NSDictionary {
