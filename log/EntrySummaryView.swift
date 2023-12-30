@@ -11,6 +11,7 @@ struct EntrySummaryView: View {
     @ObservedObject var entry: Entry
     @State var time: Int
     @ObservedObject var dateHelper: DateHelper = DateHelper.main
+    @ObservedObject var scrollHelper: ScrollHelper = ScrollHelper.main
     
     var body: some View {
         VStack(spacing: 0) {
@@ -29,8 +30,7 @@ struct EntrySummaryView: View {
                     }
                 }
                 .frame(width: 40)
-                Rectangle()
-                    .foregroundStyle(Color.white)
+                Color.white
                     .frame(width: 1)
                 ZStack {
 //                    TODO add in a color thing that HStacks color based on the colors listed
@@ -42,11 +42,18 @@ struct EntrySummaryView: View {
 //                            .multilineTextAlignment(.center)
                             .id(time)
                         Spacer()
-                    }.background { Color.black }
+                    }
                 }
                     
             }
             .frame(height: 20)
+            .background {
+                if ScrollHelper.main.focusTimeSlot == time {
+                    Color(hue: 0, saturation: 0, brightness: 0.34)
+                } else {
+                    Color.black
+                }
+            }
         }
         .onTapGesture {
             ScrollHelper.main.focusTimeSlot = time

@@ -25,6 +25,7 @@ struct MainView: View {
                 }
             }
         }
+        .scrollContentBackground(.hidden)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
                 let w = drag.translation.width // no need for height because the scroll view overrides

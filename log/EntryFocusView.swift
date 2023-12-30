@@ -21,36 +21,32 @@ struct EntryFocusView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Color.black.opacity(0.1)
-                .frame(height: 400)
-                .onTapGesture {
-                    ScrollHelper.main.focusTimeSlot = nil
-                    saveEntry()
-                }
+//            Color.black.opacity(0.1)
+//                .frame(height: 400)
+//                .onTapGesture {
+//                    ScrollHelper.main.focusTimeSlot = nil
+//                    saveEntry()
+//                }
+            Spacer().frame(height: 400)
             VStack {
                 Text(timeString)
                     .padding(.vertical, 15)
                 TextEditor(text: $entry.text)
                     .multilineTextAlignment(.center)
                     .frame(height: 300)
-                    .onTapGesture {
+                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in
                         if entry.text == promptText {
                             entry.text = ""
                         }
+                        // TODO show buttons above keyboard, move offsets appropriately
+                    }
+                    .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+                        // TODO hide buttons above keyboard, move offsets appropriately
                     }
             }
-            .background(Color.black) // TODO get this to extend to the actual bottom and ignore the fucking safe area
+            .background(Color.black)
+            .offset(x: 0, y: 40)
         }
-        .gesture(DragGesture(minimumDistance: 20)
-            .onEnded { drag in
-                let h = drag.translation.height
-                let w = drag.translation.width
-                if h/abs(w) > 0.8 {
-                    ScrollHelper.main.focusTimeSlot = nil
-                    saveEntry()
-                }
-            }
-        )
         .onAppear {
             if entry.text == "" {
                 entry.text = promptText

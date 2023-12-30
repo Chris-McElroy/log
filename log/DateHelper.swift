@@ -71,7 +71,10 @@ class DateHelper: ObservableObject {
         times = tempTimes
         hourStrings = tempHourStrings
         currentTimeSlot = getCurrentTimeSlot()
-        let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: 0), matchingPolicy: .nextTime) ?? .now
+        
+        let minute = Calendar.current.dateComponents([.minute], from: .now).minute ?? 0
+        let nextSlotMinute = ((minute/15 + 1)*15) % 60
+        let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: nextSlotMinute), matchingPolicy: .nextTime) ?? .now
         
         let slotTimer = Timer.init(fire: nextSlotTime, interval: 900, repeats: true, block: { _ in
             self.currentTimeSlot = self.getCurrentTimeSlot()

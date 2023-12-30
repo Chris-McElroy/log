@@ -25,6 +25,7 @@ struct logApp: App {
                     ScrollHelper.main.mainViewScrollProxy?.scrollTo(ScrollHelper.main.focusTimeSlot, anchor: .top)
                 }
             // TODO force restart MainView when calendar (ie time zone) changes
+            // TODO stop the current slot timer when the app resigns active and restart it when it becomes active
         }
     }
 }
