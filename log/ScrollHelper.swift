@@ -12,4 +12,17 @@ class ScrollHelper: ObservableObject {
     
     @Published var mainViewScrollProxy: ScrollViewProxy? = nil
     @Published var focusTimeSlot: Int? = nil
+    
+    func changeFocusTimeSlot(to time: Int, animate: Bool = true, keyboardUp: Bool = false, center: Bool = false) {
+        focusTimeSlot = time
+        let topDistance = keyboardUp ? 1 : (center ? 15 : 5)
+        let topTime = max(DateHelper.main.times.min() ?? 0, time - topDistance*900)
+        if animate {
+            withAnimation {
+                mainViewScrollProxy?.scrollTo(topTime, anchor: .top)
+            }
+        } else {
+            mainViewScrollProxy?.scrollTo(topTime, anchor: .top)
+        }
+    }
 }

@@ -33,7 +33,6 @@ struct EntrySummaryView: View {
                 Color.white
                     .frame(width: 1)
                 ZStack {
-//                    TODO add in a color thing that HStacks color based on the colors listed
 //                    if #available(macOS 14.0, *) {
                     HStack(spacing: 0) {
                         Spacer()
@@ -46,17 +45,29 @@ struct EntrySummaryView: View {
                 }
                     
             }
-            .frame(height: 20)
+            .frame(height: 20*CGFloat(entry.duration))
+            .offset(y: 10*CGFloat(entry.duration - 1))
             .background {
                 if ScrollHelper.main.focusTimeSlot == time {
                     Color(hue: 0, saturation: 0, brightness: 0.34)
-                } else {
+                } else if entry.colors.isEmpty {
                     Color.black
+                } else {
+                    HStack(spacing: 0) {
+                        Color.black.frame(width: 41)
+                        ForEach(0..<16) { color in
+                            if entry.colors.contains(color) {
+                                Entry.colorList[color]
+                            }
+                        }
+                    }
                 }
             }
         }
         .onTapGesture {
-            ScrollHelper.main.focusTimeSlot = time
+            withAnimation {
+                ScrollHelper.main.changeFocusTimeSlot(to: time)
+            }
         }
     }
 }

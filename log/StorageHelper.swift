@@ -18,38 +18,40 @@ class Storage: ObservableObject {
     @Published var entries: [Int: Entry] = [:]
     private var data: [String: [String: Any]] = [:]
     
-    func pullData() {
-        guard let icloudUrl = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
-            print("couldn't get icloud url")
-            return
-        }
-        
-        let containerUrl = icloudUrl.appendingPathComponent("Documents")
-        
-        let fileUrl = containerUrl.appendingPathComponent("data26.plist")
+    private func pullData() {
+        guard let dayFile = getDayFile() else { return }
         
         do {
-            let nsData = try NSDictionary(contentsOf: fileUrl, error: {}())
-            data = Dictionary(_immutableCocoaDictionary: nsData)
+            let nsData = try NSDictionary(contentsOf: dayFile, error: {}())
+            data[DateHelper.main.day] = Dictionary(_immutableCocoaDictionary: nsData)
         } catch {
             print("couldn't get contents")
         }
     }
     
-    func pushData() {
-        guard let containerUrl = FileManager.default.url(forUbiquityContainerIdentifier: nil)?.appendingPathComponent("Documents") else {
-            print("couldn't get container url")
-            return
+    private func getDayFile() -> URL? {
+        guard let icloudFolder = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
+            print("couldn't get icloud url")
+            return nil
         }
         
-        let fileUrl = containerUrl.appendingPathComponent("data26.plist")
+        let documentsFolder = icloudFolder.appendingPathComponent("Documents")
         
-        do {
-            try NSDictionary(dictionary: data, copyItems: false).write(to: fileUrl)
+        let dayString = DateHelper.main.day
+        let dateComp = dayString.split(separator: ".")
+        let yearFolder = documentsFolder.appendingPathComponent("data" + dateComp[0])
+        let monthFolder = yearFolder.appendingPathComponent("data" + dateComp[0] + "." + dateComp[1])
+        
+        if !FileManager.default.fileExists(atPath: monthFolder.path(percentEncoded: false)) {
+            do {
+                try FileManager.default.createDirectory(at: monthFolder, withIntermediateDirectories: true)
+            } catch {
+                print("couldn't create folder")
+            }
         }
-        catch {
-            print("couldn't write", error.localizedDescription)
-        }
+        
+        let dayFile = monthFolder.appendingPathComponent("data" + DateHelper.main.day + ".plist")
+        return dayFile
     }
     
     func loadEntries() {
@@ -69,16 +71,31 @@ class Storage: ObservableObject {
         }
         
         entries = tempEntries
+        
+        if let focusSlot = ScrollHelper.main.focusTimeSlot {
+            ScrollHelper.main.changeFocusTimeSlot(to: focusSlot, animate: true)
+        }
     }
     
-    func set(_ entry: Entry, at time: Int) {
-        pullData()
-        let timeString = "g" + String(time)
-        if entry.isEmpty() {
-            data[DateHelper.main.day]?[timeString] = nil
-        } else {
-            data[DateHelper.main.day, default: [:]][timeString] = entry.toDict()
+    func saveEntries() {
+        let dayString = DateHelper.main.day
+        
+        for (time, entry) in entries {
+            let timeString = "g" + String(time)
+            if entry.isEmpty() {
+                data[dayString]?[timeString] = nil
+            } else {
+                data[dayString, default: [:]][timeString] = entry.toDict()
+            }
         }
-        pushData()
+        
+        guard let dayFile = getDayFile() else { return }
+        
+        do {
+            try NSDictionary(dictionary: data[dayString] ?? [:], copyItems: false).write(to: dayFile)
+        }
+        catch {
+            print("couldn't write", dayString, error.localizedDescription)
+        }
     }
 }
