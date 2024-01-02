@@ -11,7 +11,8 @@ import UIKit
 let promptText = "tap to edit"
 
 struct EntryFocusPopup: View {
-    @State var durationDragLength: CGFloat? = nil
+    @State var lastDragHeight: CGFloat? = nil
+    @State var movingStart: Bool? = nil
     
     @ObservedObject var storage = Storage.main
     @ObservedObject var dateHelper = DateHelper.main
@@ -88,7 +89,6 @@ struct EntryFocusPopup: View {
             if focusHelper.editingDuration {
                 Color.black.opacity(0.0001)
                     .gesture(changeEntryStartGesture)
-                Spacer().frame(height: 160)
                 Color.black.opacity(0.0001)
                     .gesture(changeEntryDurationGesture)
             } else {
@@ -100,62 +100,107 @@ struct EntryFocusPopup: View {
     var changeEntryStartGesture: some Gesture {
         DragGesture()
             .onChanged { drag in
+                guard let scrollingUp = scrollingUp(for: drag) else { return }
                 guard let time = focusHelper.time else { return }
                 guard let entry = storage.entries[time] else { return }
-                let height = drag.translation.height
-                let travel = abs(abs(height) - (durationDragLength ?? 0))
-                if travel > 20 {
-                    durationDragLength = abs(height)
-                    let newTime = height < 0 ?
-                                    time - 900 : // if scrolling up, next entry is the one preceding current start
-                                    time + 900   // if scrolling down, next entry is the one following current start
-                    if height < 0 {
-                        // if scrolling up, make sure next entry is blank
-                        guard storage.entries[newTime]?.isEmpty() == true else { return }
+                movingStart = (movingStart ?? true) ? entry.duration > 1 || scrollingUp : entry.duration == 1 && scrollingUp
+                if movingStart == true {
+                    if scrollingUp {
+                        moveEntryStartEarlier(entry: entry, time: time)
                     } else {
-                        // if scrolling down, make sure this entry will have positive duration
-                        guard storage.entries[newTime] == nil && entry.duration > 1 else { return }
+                        moveEntryStartLater(entry: entry, time: time)
                     }
-                    storage.entries[newTime] = entry
-                    focusHelper.changeStartTime(to: newTime)
-                    storage.entries[time] = height < 0 ? nil : Entry("")
-                    entry.duration += height < 0 ? 1 : -1
-                    storage.saveEntries()
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                } else {
+                    if scrollingUp {
+                        moveEntryEndEarlier(entry: entry, time: time)
+                    } else {
+                        moveEntryEndLater(entry: entry, time: time)
+                    }
                 }
             }
             .onEnded { _ in
-                durationDragLength = nil
+                lastDragHeight = nil
+                movingStart = nil
             }
     }
     
     var changeEntryDurationGesture: some Gesture {
         DragGesture()
             .onChanged { drag in
+                guard let scrollingUp = scrollingUp(for: drag) else { return }
                 guard let time = focusHelper.time else { return }
                 guard let entry = storage.entries[time] else { return }
-                let height = drag.translation.height
-                let travel = abs(abs(height) - (durationDragLength ?? 0))
-                if travel > 20 {
-                    durationDragLength = abs(height)
-                    let nextTime = height > 0 ?
-                                        time + entry.duration*900 : // if scrolling down, next entry is the one following the end time
-                                        time + entry.duration*900 - 900 // if scrolling up, the next entry is the bottom of this entry
-                    if height > 0 {
-                        // if scrolling down, make sure next entry is blank
-                        guard storage.entries[nextTime]?.isEmpty() == true else { return }
+                movingStart = (movingStart ?? false) ? entry.duration > 1 || scrollingUp : entry.duration == 1 && scrollingUp
+                if movingStart == true {
+                    if scrollingUp {
+                        moveEntryStartEarlier(entry: entry, time: time)
                     } else {
-                        // if scrolling up, make sure this entry will have positive duration
-                        guard storage.entries[nextTime] == nil && entry.duration > 1 else { return }
+                        moveEntryStartLater(entry: entry, time: time)
                     }
-                    entry.duration += height > 0 ? 1 : -1
-                    storage.entries[nextTime] = height > 0 ? nil : Entry("")
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                } else {
+                    if scrollingUp {
+                        moveEntryEndEarlier(entry: entry, time: time)
+                    } else {
+                        moveEntryEndLater(entry: entry, time: time)
+                    }
                 }
             }
             .onEnded { _ in
-                durationDragLength = nil
+                lastDragHeight = nil
+                movingStart = nil
             }
+    }
+    
+    func scrollingUp(for drag: DragGesture.Value) -> Bool? {
+        let height = drag.translation.height
+        let travel = height - (lastDragHeight ?? 0)
+        if abs(travel) > 20 {
+            lastDragHeight = height
+            return travel < 0
+        }
+        return nil
+    }
+    
+    func moveEntryStartEarlier(entry: Entry, time: Int) {
+        let newTime = time - 900 // just above the entry start
+        guard storage.entries[newTime]?.isEmpty() == true else { return } // next entry is blank
+        storage.entries[newTime] = entry
+        entry.duration += 1
+        focusHelper.changeStartTime(to: newTime)
+        storage.entries[time] = nil
+        storage.saveEntries()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+    
+    func moveEntryStartLater(entry: Entry, time: Int) {
+        let newTime = time + 900 // just below the entry start
+        guard storage.entries[newTime] == nil else { return } // entry was marked nil
+        storage.entries[newTime] = entry
+        entry.duration -= 1
+        focusHelper.changeStartTime(to: newTime)
+        storage.entries[time] = Entry("")
+        storage.saveEntries()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+    
+    func moveEntryEndEarlier(entry: Entry, time: Int) {
+        let nextTime = time + entry.duration*900 - 900 // end of the entry
+        guard storage.entries[nextTime] == nil else { return } // entry was marked nil
+        entry.duration -= 1
+        focusHelper.adjustScroll()
+        storage.entries[nextTime] = Entry("")
+        storage.saveEntries()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+    
+    func moveEntryEndLater(entry: Entry, time: Int) {
+        let nextTime = time + entry.duration*900 // just below the entry end
+        guard storage.entries[nextTime]?.isEmpty() == true else { return } // next entry is blank
+        entry.duration += 1
+        focusHelper.adjustScroll()
+        storage.entries[nextTime] = nil
+        storage.saveEntries()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
     
     var buttonRow: some View {

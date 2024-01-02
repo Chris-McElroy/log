@@ -32,7 +32,7 @@ class Entry: ObservableObject, Equatable {
     }
     
     func isEmpty() -> Bool {
-        text == "" && colors.isEmpty && duration == 1
+        (text == "" || text == promptText) && colors.isEmpty && duration == 1
     }
     
     func toDict() -> NSDictionary {

@@ -18,12 +18,11 @@ class FocusHelper: ObservableObject {
     
     func changeTime(to time: Int?, animate: Bool = true) {
         editingText = false // otherwise text editor edits the old text
+        Storage.main.saveEntries()
         
         if let old = self.time, Storage.main.entries[old]?.text == promptText {
             Storage.main.entries[old]?.text = ""
         }
-        Storage.main.saveEntries()
-        
         
         if var new = time {
             while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
@@ -46,7 +45,7 @@ class FocusHelper: ObservableObject {
     
     func adjustScroll(animate: Bool = true) {
         guard let time = time else { return }
-        let topDistance = (editingText || editingColors) ? 1 : (editingDuration ? 15 : 5)
+        let topDistance = (editingText || editingColors) ? 1 : (editingDuration ? 16 - ((Storage.main.entries[time]?.duration ?? 1))/2 : 5)
         let topTime = max(DateHelper.main.times.min() ?? 0, time - topDistance*900)
         if animate {
             withAnimation {

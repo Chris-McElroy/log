@@ -112,13 +112,13 @@ class DateHelper: ObservableObject {
         
         let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? .now
         let tomorrowRef = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow)
-        if dateRef == tomorrowRef {
+        if dateRef == tomorrowRef && times.contains(currentTimeToday - 86400) {
             return currentTimeToday - 86400
         }
         
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: now) ?? .now
         let yesterdayRef = Calendar.current.dateComponents([.year, .month, .day], from: yesterday)
-        if dateRef == yesterdayRef {
+        if dateRef == yesterdayRef && times.contains(currentTimeToday + 86400) {
             return currentTimeToday + 86400
         }
         
