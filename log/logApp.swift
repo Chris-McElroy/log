@@ -12,7 +12,6 @@ struct logApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .padding(.bottom, 1)
                 .font(Font.custom("Baskerville", size: 14.0))
                 .buttonStyle(PlainButtonStyle())
 //                .foregroundStyle(Color.white) // this was making everything error out?
@@ -22,11 +21,11 @@ struct logApp: App {
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                     if let currentTime = DateHelper.main.getCurrentTimeSlot() {
-                        ScrollHelper.main.changeFocusTimeSlot(to: currentTime, animate: false)
+                        FocusHelper.main.changeTime(to: currentTime, animate: false)
                     }
                 }
-            // TODO force restart MainView when calendar (ie time zone) changes
-            // TODO stop the current slot timer when the app resigns active and restart it when it becomes active
+            // laterDo force restart MainView when calendar (ie time zone) changes
+            // laterDo stop the current slot timer when the app resigns active and restart it when it becomes active
         }
     }
 }

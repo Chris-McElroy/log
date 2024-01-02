@@ -11,7 +11,7 @@ import SwiftUI
 struct MainView: View {
     @ObservedObject var storage = Storage.main
     @ObservedObject var dateHelper = DateHelper.main
-    @ObservedObject var scrollHelper = ScrollHelper.main
+    @ObservedObject var focusHelper = FocusHelper.main
     
     var body: some View {
         ZStack {
@@ -23,33 +23,15 @@ struct MainView: View {
                     }
                 }.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
             }
-            if let time = ScrollHelper.main.focusTimeSlot { // TODO remove these ifs, focus view should always be there, just hidden
-                if let entry = storage.entries[time] {
-                    EntryFocusView(entry: entry, time: time)
-                }
-            }
+            EntryFocusPopup()
         }
         .scrollContentBackground(.hidden)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
-                let w = drag.translation.width // no need for height because the scroll view overrides
-                dateHelper.changeDay(forward: w < 0)
+                dateHelper.changeDay(forward: drag.translation.width < 0)
                 storage.loadEntries()
             }
         )
-        .onChange(of: scrollHelper.focusTimeSlot) { old, new in
-            if let old {
-                if storage.entries[old]?.text == promptText { // TODO move these to entry focus view when that's always active, ensure it doesn't happen when isFocused
-                    storage.entries[old]?.text = ""
-                }
-            }
-            storage.saveEntries()
-            if let new {
-                if storage.entries[new]?.text == "" {
-                    storage.entries[new]?.text = promptText
-                }
-            }
-        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
             storage.saveEntries()
         }
@@ -64,16 +46,46 @@ struct MainView: View {
     var entriesList: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(dateHelper.times, id: \.self) { time in
-                        EntrySummaryView(entry: storage.entries[time] ?? Entry(""), time: time)
-                    }
+                HStack(spacing: 0) {
+                    timeList
+                    Color.white.frame(width: 1)
+                    summaryList
                 }
-                .onAppear {
-                    scrollHelper.mainViewScrollProxy = proxy
-                }
+                Spacer().frame(height: focusHelper.time == nil ? 80 : 375)
             }
             .scrollIndicators(.hidden)
+            .onAppear {
+                focusHelper.scrollProxy = proxy
+            }
+        }
+    }
+    
+    var timeList: some View {
+        VStack(spacing: 0) {
+            ForEach(dateHelper.times, id: \.self) { time in
+                VStack(spacing: 0) {
+                    if dateHelper.hourStrings[time] != nil {
+                        Color.white
+                            .frame(height: 1)
+                    }
+                    Text(dateHelper.hourStrings[time] ?? "")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .foregroundStyle(time == dateHelper.currentTimeSlot ? Color.black : Color.white)
+                        .background(time == dateHelper.currentTimeSlot ? Color.white : Color.black)
+                }
+                .frame(width: 40, height: 20)
+                .id(time)
+            }
+        }
+    }
+    
+    var summaryList: some View {
+        VStack(spacing: 0) {
+            ForEach(dateHelper.times, id: \.self) { time in
+                if let entry = storage.entries[time] {
+                    EntrySummaryView(time: time, entry: entry)
+                }
+            }
         }
     }
 }

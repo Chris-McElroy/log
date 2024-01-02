@@ -50,7 +50,7 @@ class DateHelper: ObservableObject {
     func loadTimes(lo: Int?, hi: Int?) {
         let offset = DateHelper.timeZoneOffset()
         let lo = min(-offset, lo ?? -offset)
-        let hi = max(108000-offset, hi ?? 108000-offset)
+        let hi = max(110700-offset, hi ?? 110700-offset)
         
         var tempTimes: [Int] = []
         
@@ -82,8 +82,10 @@ class DateHelper: ObservableObject {
         RunLoop.current.add(slotTimer, forMode: .common)
     }
     
-    func getTimeString(start: Int, duration: Int) -> String {
+    func getTimeString() -> String {
         let offset = DateHelper.timeZoneOffset()
+        guard let start = FocusHelper.main.time else { return "" }
+        guard let duration = Storage.main.entries[start]?.duration else { return "" }
         
         let startHour = String((start + offset)/3600)
         let startMinute = String(((start + offset + 360000) % 3600)/60)

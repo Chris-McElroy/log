@@ -72,8 +72,8 @@ class Storage: ObservableObject {
         
         entries = tempEntries
         
-        if let focusSlot = ScrollHelper.main.focusTimeSlot {
-            ScrollHelper.main.changeFocusTimeSlot(to: focusSlot, animate: true)
+        if let time = FocusHelper.main.time {
+            FocusHelper.main.changeTime(to: time, animate: true)
         }
     }
     
