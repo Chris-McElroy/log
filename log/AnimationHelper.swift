@@ -47,7 +47,6 @@ class AnimationHelper {
            let mass = springParams.value(forKey: "mass") as? Double,
            let stiffness = springParams.value(forKey: "stiffness") as? Double,
            let damping = springParams.value(forKey: "damping") as? Double {
-            print("specs", mass, stiffness, damping)
             return Animation.interpolatingSpring(mass: mass, stiffness: stiffness, damping: damping)
         } else {
             return Animation.easeOut(duration: duration) // this is the closest fallback

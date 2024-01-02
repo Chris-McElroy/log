@@ -24,11 +24,24 @@ class FocusHelper: ObservableObject {
         }
         Storage.main.saveEntries()
         
-        self.time = time
-        if let new = time, Storage.main.entries[new]?.text == "" {
-            Storage.main.entries[new]?.text = promptText
+        
+        if var new = time {
+            while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
+                new -= 900
+            }
+            self.time = new
+            if Storage.main.entries[new]?.text == "" {
+                Storage.main.entries[new]?.text = promptText
+            }
             adjustScroll(animate: animate)
+        } else {
+            self.time = time
         }
+    }
+    
+    func changeStartTime(to time: Int) {
+        self.time = time
+        adjustScroll()
     }
     
     func adjustScroll(animate: Bool = true) {

@@ -64,8 +64,14 @@ class Storage: ObservableObject {
         }
         
         DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
+        var nilQueue = 0
         for time in DateHelper.main.times {
-            if tempEntries[time] == nil {
+            if nilQueue > 0 {
+                tempEntries[time] = nil
+                nilQueue -= 1
+            } else if let entry = tempEntries[time] {
+                nilQueue += entry.duration - 1
+            } else {
                 tempEntries[time] = Entry("")
             }
         }
@@ -79,13 +85,12 @@ class Storage: ObservableObject {
     
     func saveEntries() {
         let dayString = DateHelper.main.day
+        data[dayString] = [:] // resetting so that nil entries are not kept
         
         for (time, entry) in entries {
             let timeString = "g" + String(time)
-            if entry.isEmpty() {
-                data[dayString]?[timeString] = nil
-            } else {
-                data[dayString, default: [:]][timeString] = entry.toDict()
+            if !entry.isEmpty() {
+                data[dayString]?[timeString] = entry.toDict()
             }
         }
         

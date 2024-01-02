@@ -117,9 +117,10 @@ struct EntryFocusPopup: View {
                         guard storage.entries[newTime] == nil && entry.duration > 1 else { return }
                     }
                     storage.entries[newTime] = entry
-                    focusHelper.changeTime(to: newTime)
+                    focusHelper.changeStartTime(to: newTime)
                     storage.entries[time] = height < 0 ? nil : Entry("")
                     entry.duration += height < 0 ? 1 : -1
+                    storage.saveEntries()
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
             }
