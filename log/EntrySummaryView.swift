@@ -33,9 +33,10 @@ struct EntrySummaryView: View {
                 Color.black
             } else {
                 HStack(spacing: 0) {
-                    ForEach(0..<16) { color in
+                    ForEach(0..<16) { i in
+                        let color = Categories.displayOrder[i]
                         if entry.colors.contains(color) {
-                            Entry.colorList[color]
+                            Categories.colors[color]
                         }
                     }
                 }

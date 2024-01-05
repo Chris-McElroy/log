@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 let promptText = "tap to edit"
 
@@ -48,9 +47,10 @@ struct EntryFocusPopup: View {
                     .frame(height: 50)
                     .background {
                         HStack(spacing: 0) {
-                            ForEach(0..<16) { color in
+                            ForEach(0..<16) { i in
+                                let color = Categories.displayOrder[i]
                                 if entry.colors.contains(color) {
-                                    Entry.colorList[color]
+                                    Categories.colors[color]
                                 }
                             }
                         }
@@ -328,7 +328,7 @@ struct EntryFocusPopup: View {
                 ForEach(0..<4) { row in
                     GridRow {
                         ForEach(0..<4) { column in
-                            ColorButton(num: row*4 + column, entry: entry)
+                            ColorButton(num: Categories.numFromPos[row][column], entry: entry)
                         }
                     }
                 }
@@ -345,8 +345,8 @@ struct EntryFocusPopup: View {
         
         init(num: Int, entry: Entry) {
             self.num = num
-            name = ColorButton.nameList[num]
-            color = Entry.colorList[num]
+            name =  Categories.names[num]
+            color = Categories.colors[num]
             self.entry = entry
         }
         
@@ -362,25 +362,6 @@ struct EntryFocusPopup: View {
                     }
                 }
         }
-        
-        static let nameList: [String] = [
-            "hurting",
-            "arousing",
-            "relaxing",
-            "eating",
-            "exercising",
-            "shopping",
-            "meeting",
-            "researching",
-            "projecting",
-            "socializing",
-            "traveling",
-            "communicating",
-            "configuring",
-            "householding",
-            "thinking",
-            "sleeping",
-        ]
     }
 }
 
