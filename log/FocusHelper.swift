@@ -17,6 +17,7 @@ class FocusHelper: ObservableObject {
     @Published var time: Int? = nil
     
     func changeTime(to time: Int?, animate: Bool = true) {
+        let wasEditing = editingText
         editingText = false // otherwise text editor edits the old text
         Storage.main.saveEntries()
         
@@ -29,9 +30,10 @@ class FocusHelper: ObservableObject {
                 new -= 900
             }
             self.time = new
-            if Storage.main.entries[new]?.text == "" {
+            if Storage.main.entries[new]?.text == "" && !wasEditing {
                 Storage.main.entries[new]?.text = promptText
             }
+            editingText = wasEditing
             adjustScroll(animate: animate)
         } else {
             self.time = time

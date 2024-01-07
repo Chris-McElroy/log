@@ -55,30 +55,23 @@ struct EntryFocusPopup: View {
                             }
                         }
                     }
-                ZStack {
-                    TextEditor(text: $entry.text)
-                        .multilineTextAlignment(.center)
-                        .focused($isFocused)
-                        .onChange(of: isFocused) {
-                            if focusHelper.editingText != isFocused {
-                                focusHelper.editingText = isFocused
-                            }
-                            if isFocused && entry.text == promptText {
-                                entry.text = ""
-                            } else if !isFocused && entry.text == "" {
-                                entry.text = promptText
-                            }
-                            focusHelper.adjustScroll()
+                TextEditor(text: $entry.text)
+                    .multilineTextAlignment(.center)
+                    .focused($isFocused)
+                    .onChange(of: isFocused) {
+                        focusHelper.editingText = isFocused
+                        focusHelper.editingColors = false
+                        
+                        if isFocused && entry.text == promptText {
+                            entry.text = ""
+                        } else if !isFocused && entry.text == "" {
+                            entry.text = promptText
                         }
-                        .onChange(of: focusHelper.editingText) {
-                            if focusHelper.editingText != isFocused {
-                                isFocused = focusHelper.editingText
-                            }
-                        }
-                    if focusHelper.editingColors {
-                        Color.black.opacity(0.05)
+                        focusHelper.adjustScroll()
                     }
-                }
+                    .onChange(of: focusHelper.editingText) {
+                        isFocused = focusHelper.editingText
+                    }
                 .frame(height: focusHelper.editingDuration ? 1 : 200)
             }
         }
@@ -206,19 +199,15 @@ struct EntryFocusPopup: View {
     var buttonRow: some View {
         HStack {
             editDurationButton
-            Spacer()
             editColorsButton
-            Spacer()
             moveFocusEarlierButton
-            Spacer()
             moveFocusLaterButton
-            Spacer()
             editTextButton
-            Spacer()
             lowerPopupButton
         }
-        .padding(.all, 20)
-        .frame(height: 40)
+        .buttonStyle(FocusButtons())
+//        .padding(.horizontal, 20)
+        .frame(height: 50)
     }
     
     var editDurationButton: some View {
@@ -318,6 +307,18 @@ struct EntryFocusPopup: View {
                 focusHelper.editingColors = false
                 focusHelper.editingDuration = false
                 focusHelper.changeTime(to: nil)
+            }
+        }
+    }
+    
+    struct FocusButtons: ButtonStyle {
+        func makeBody(configuration: Self.Configuration) -> some View {
+            HStack {
+                Spacer()
+                configuration.label
+                    .opacity(1.0)
+                    .padding(.vertical, 20)
+                Spacer()
             }
         }
     }
