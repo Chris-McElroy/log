@@ -39,7 +39,6 @@ struct EntryFocusPopup: View {
         @ObservedObject var entry: Entry
         @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
         @FocusState var isFocused: Bool
-        @State var mergeTimer: Timer? = nil
         
         var body: some View {
             VStack(spacing: 0) {
@@ -82,12 +81,7 @@ struct EntryFocusPopup: View {
         
         func updateLastEdit(old: Any, new: Any) {
             entry.lastEdit = .now
-            mergeTimer?.invalidate()
-            mergeTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
-                DispatchQueue(label: "merge queue", qos: .utility).async {
-                    Storage.main.mergeEntries()
-                }
-            })
+            Storage.main.startUpdateTimer(after: 1)
         }
     }
     

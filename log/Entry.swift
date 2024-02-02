@@ -47,6 +47,10 @@ class Entry: ObservableObject, Equatable, Hashable {
     }
     
     func isEmpty() -> Bool {
+        (text == "" || text == promptText) && colors.isEmpty && duration == 1
+    }
+    
+    func isNil() -> Bool {
         (text == "" || text == promptText) && colors.isEmpty && duration == 1 && lastEdit == nil
     }
     

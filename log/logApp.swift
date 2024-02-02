@@ -46,7 +46,6 @@ struct logApp: App {
                     Storage.main.stopUpdateTimer()
                 }
             // laterDo force restart MainView when calendar (ie time zone) changes
-            // laterDo stop the current slot timer when the app resigns active and restart it when it becomes active
         }
     }
 }

@@ -48,7 +48,7 @@ class DateHelper: ObservableObject {
         UserDefaults.standard.setValue(dateRef.day ?? 1, forKey: "day")
     }
     
-    func loadTimes(lo: Int?, hi: Int?) {
+    func loadTimes(lo: Int?, hi: Int?) -> [Int] {
         let offset = DateHelper.timeZoneOffset()
         let lo = min(-offset, lo ?? -offset)
         let hi = max(110700-offset, hi ?? 110700-offset)
@@ -74,6 +74,8 @@ class DateHelper: ObservableObject {
             self.hourStrings = tempHourStrings
             self.currentTimeSlot = self.getCurrentTimeSlot()
         }
+        
+        return tempTimes
     }
     
     func startTimeSlotTimer() {

@@ -83,9 +83,9 @@ class Storage: ObservableObject {
     private func updateEntries(from dict: [Int: Entry]) {
         var tempEntries = dict
         
-        DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
+        let timeList = DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
         var nilQueue = 0
-        for time in DateHelper.main.times {
+        for time in timeList {
             if nilQueue > 0 {
                 tempEntries[time] = nil
                 nilQueue -= 1
@@ -113,10 +113,31 @@ class Storage: ObservableObject {
         
         guard localEntrySet != onlineEntrySet else { print("not saving"); return }
         
-        print("saving",  localEntrySet.count, onlineEntrySet.count, localEntrySet.subtracting(onlineEntrySet).map { (time, $0.entry.text) })
+        let localDifference = localEntrySet.subtracting(onlineEntrySet)
+        let onlineDifference = onlineEntrySet.subtracting(localEntrySet)
+        
+        let localTimes = localDifference.map { $0.time }
+        let onlineTimes = onlineDifference.map { $0.time }
+        
+        if onlineTimes == localTimes {
+            var allEmpty = true
+            for time in localTimes {
+                if onlineEntries[time]?.isEmpty() != true || entries[time]?.isEmpty() != true {
+                    allEmpty = false
+                    break
+                }
+            }
+            if allEmpty {
+                print("not saving 2")
+                return
+            }
+        }
+        
+        print("saving")
+        print(localEntrySet.subtracting(onlineEntrySet).map { ($0.time, $0.entry.text, $0.entry.lastEdit!.timeIntervalSinceNow) })
+        print(onlineEntrySet.subtracting(localEntrySet).map { ($0.time, $0.entry.text, $0.entry.lastEdit!.timeIntervalSinceNow) })
         
         let entrySet = onlineEntrySet.union(localEntrySet)
-        print("combined:", entrySet.filter({ $0.time == 100800 }).count, entrySet.first(where: { $0.time == 100800 })?.entry.text ?? "blank", Int(entrySet.first(where: { $0.time == 100800 })?.entry.lastEdit?.timeIntervalSinceNow ?? 0))
         
         let entryList = entrySet.sorted(by: {
             $0.entry.lastEdit ?? .init(timeIntervalSinceReferenceDate: 0) > $1.entry.lastEdit ?? .init(timeIntervalSinceReferenceDate: 0)
@@ -153,7 +174,7 @@ class Storage: ObservableObject {
         
         func getEntrySet(from dict: [Int: Entry]) -> Set<EntryInfo> {
             return Set(dict.compactMap { (time, entry) in
-                if entry.isEmpty() { return nil }
+                if entry.isNil() { return nil }
                 return EntryInfo(time: time, times: getEntryTimes(time: time, duration: entry.duration), entry: entry)
             })
         }
@@ -169,9 +190,9 @@ class Storage: ObservableObject {
         }
     }
     
-    func startUpdateTimer() {
+    func startUpdateTimer(after wait: TimeInterval = 5) {
         updateTimer?.invalidate()
-        updateTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
+        updateTimer = Timer.scheduledTimer(withTimeInterval: wait, repeats: false, block: { _ in
             self.mergeEntries()
         })
     }
