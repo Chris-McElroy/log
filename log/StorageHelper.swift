@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if os(macOS)
+import AppKit
+#endif
 
 /* largely from
 https://stackoverflow.com/questions/65173861/saving-a-file-to-icloud-drive
@@ -15,8 +18,10 @@ https://developer.apple.com/documentation/uikit/documents_data_and_pasteboard/sy
 class Storage: ObservableObject {
     static let main = Storage()
     
+    private var query: NSMetadataQuery? = nil
     @Published var entries: [Int: Entry] = [:]
     private var data: [String: [String: Any]] = [:]
+    private var updateTimer: Timer? = nil
     
     private func pullData() {
         guard let dayFile = getDayFile() else { return }
@@ -51,10 +56,11 @@ class Storage: ObservableObject {
         }
         
         let dayFile = monthFolder.appendingPathComponent("data" + DateHelper.main.day + ".plist")
+        
         return dayFile
     }
     
-    func loadEntries() {
+    private func getEntries() -> [Int: Entry] {
         pullData()
         
         var tempEntries: [Int: Entry] = [:]
@@ -62,6 +68,20 @@ class Storage: ObservableObject {
             guard let entryDict = entryData as? NSDictionary else { continue }
             tempEntries[Int(time.dropFirst()) ?? 0] = Entry(from: entryDict)
         }
+        
+        return tempEntries
+    }
+    
+    func loadEntries() {
+        updateEntries(from: getEntries())
+        
+        if let time = FocusHelper.main.time {
+            FocusHelper.main.changeTime(to: time, animate: true)
+        }
+    }
+    
+    private func updateEntries(from dict: [Int: Entry]) {
+        var tempEntries = dict
         
         DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
         var nilQueue = 0
@@ -72,35 +92,92 @@ class Storage: ObservableObject {
             } else if let entry = tempEntries[time] {
                 nilQueue += entry.duration - 1
             } else {
-                tempEntries[time] = Entry("")
+                tempEntries[time] = Entry()
             }
         }
         
-        entries = tempEntries
-        
-        if let time = FocusHelper.main.time {
-            FocusHelper.main.changeTime(to: time, animate: true)
+        DispatchQueue.main.async {
+            self.entries = tempEntries
         }
     }
     
-    func saveEntries() {
+    func mergeEntries() {
+        guard !entries.isEmpty else { loadEntries(); return }
+        
+        startUpdateTimer()
+        
+        let onlineEntries = getEntries()
+            
+        let onlineEntrySet = getEntrySet(from: onlineEntries)
+        let localEntrySet = getEntrySet(from: entries)
+        
+        guard localEntrySet != onlineEntrySet else { print("not saving"); return }
+        
+        print("saving",  localEntrySet.count, onlineEntrySet.count, localEntrySet.subtracting(onlineEntrySet).map { (time, $0.entry.text) })
+        
+        let entrySet = onlineEntrySet.union(localEntrySet)
+        print("combined:", entrySet.filter({ $0.time == 100800 }).count, entrySet.first(where: { $0.time == 100800 })?.entry.text ?? "blank", Int(entrySet.first(where: { $0.time == 100800 })?.entry.lastEdit?.timeIntervalSinceNow ?? 0))
+        
+        let entryList = entrySet.sorted(by: {
+            $0.entry.lastEdit ?? .init(timeIntervalSinceReferenceDate: 0) > $1.entry.lastEdit ?? .init(timeIntervalSinceReferenceDate: 0)
+        })
+        
+        var currentTimes: Set<Int> = []
         let dayString = DateHelper.main.day
         data[dayString] = [:] // resetting so that nil entries are not kept
+        var newEntries: [Int: Entry] = [:]
         
-        for (time, entry) in entries {
-            let timeString = "g" + String(time)
-            if !entry.isEmpty() {
-                data[dayString]?[timeString] = entry.toDict()
+        for info in entryList {
+            if currentTimes.isDisjoint(with: info.times) {
+                currentTimes.formUnion(info.times)
+                data[dayString]?["g\(info.time)"] = info.entry.toDict()
+                newEntries[info.time] = info.entry
             }
         }
         
-        guard let dayFile = getDayFile() else { return }
+        updateEntries(from: newEntries)
         
+        guard let dayFile = getDayFile() else { return }
         do {
             try NSDictionary(dictionary: data[dayString] ?? [:], copyItems: false).write(to: dayFile)
         }
         catch {
             print("couldn't write", dayString, error.localizedDescription)
         }
+        
+        struct EntryInfo: Hashable {
+            let time: Int
+            let times: Set<Int>
+            let entry: Entry
+        }
+        
+        func getEntrySet(from dict: [Int: Entry]) -> Set<EntryInfo> {
+            return Set(dict.compactMap { (time, entry) in
+                if entry.isEmpty() { return nil }
+                return EntryInfo(time: time, times: getEntryTimes(time: time, duration: entry.duration), entry: entry)
+            })
+        }
+        
+        func getEntryTimes(time: Int, duration: Int) -> Set<Int> {
+            var currentTime = time
+            var times: Set<Int> = []
+            for _ in 0..<duration {
+                times.insert(currentTime)
+                currentTime += 900
+            }
+            return times
+        }
+    }
+    
+    func startUpdateTimer() {
+        updateTimer?.invalidate()
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: false, block: { _ in
+            self.mergeEntries()
+        })
+    }
+    
+    func stopUpdateTimer() {
+        updateTimer?.invalidate()
+        updateTimer = nil
     }
 }

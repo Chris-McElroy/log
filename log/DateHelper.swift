@@ -15,6 +15,7 @@ class DateHelper: ObservableObject {
     @Published var hourStrings: [Int: String] = [:]
     @Published var currentTimeSlot: Int? = nil
     private var dateRef: DateComponents
+    private var timeSlotTimer: Timer? = nil
     
     init() {
         let year = UserDefaults.standard.value(forKey: "year") as? Int ?? 2024
@@ -68,18 +69,30 @@ class DateHelper: ObservableObject {
             }
         }
         
-        times = tempTimes
-        hourStrings = tempHourStrings
-        currentTimeSlot = getCurrentTimeSlot()
-        
+        DispatchQueue.main.async {
+            self.times = tempTimes
+            self.hourStrings = tempHourStrings
+            self.currentTimeSlot = self.getCurrentTimeSlot()
+        }
+    }
+    
+    func startTimeSlotTimer() {
         let minute = Calendar.current.dateComponents([.minute], from: .now).minute ?? 0
         let nextSlotMinute = ((minute/15 + 1)*15) % 60
         let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: nextSlotMinute), matchingPolicy: .nextTime) ?? .now
         
-        let slotTimer = Timer.init(fire: nextSlotTime, interval: 900, repeats: true, block: { _ in
+        timeSlotTimer?.invalidate()
+        timeSlotTimer = Timer.init(fire: nextSlotTime, interval: 2, repeats: true, block: { _ in
             self.currentTimeSlot = self.getCurrentTimeSlot()
         })
-        RunLoop.current.add(slotTimer, forMode: .common)
+        if let timeSlotTimer {
+            RunLoop.current.add(timeSlotTimer, forMode: .common)
+        }
+    }
+    
+    func stopTimeSlotTimer() {
+        timeSlotTimer?.invalidate()
+        timeSlotTimer = nil
     }
     
     func getTimeString() -> String {

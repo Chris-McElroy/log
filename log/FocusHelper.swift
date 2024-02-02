@@ -19,7 +19,7 @@ class FocusHelper: ObservableObject {
     func changeTime(to time: Int?, animate: Bool = true) {
         let wasEditing = editingText
         editingText = false // otherwise text editor edits the old text
-        Storage.main.saveEntries()
+        Storage.main.mergeEntries() // this is where it auto overwrites
         
         if let old = self.time, Storage.main.entries[old]?.text == promptText {
             Storage.main.entries[old]?.text = ""

@@ -21,20 +21,21 @@ struct MainView: View {
                         dayTitle
                         entriesList
                     }
-                }.frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                }
+#if os(iOS)
+                .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+#endif
             }
             EntryFocusPopup()
         }
         .scrollContentBackground(.hidden)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
+                storage.mergeEntries()
                 dateHelper.changeDay(forward: drag.translation.width < 0)
                 storage.loadEntries()
             }
         )
-        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-            storage.saveEntries()
-        }
     }
     
     var dayTitle: some View {

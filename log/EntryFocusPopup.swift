@@ -39,6 +39,7 @@ struct EntryFocusPopup: View {
         @ObservedObject var entry: Entry
         @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
         @FocusState var isFocused: Bool
+        @State var mergeTimer: Timer? = nil
         
         var body: some View {
             VStack(spacing: 0) {
@@ -74,6 +75,19 @@ struct EntryFocusPopup: View {
                     }
                 .frame(height: focusHelper.editingDuration ? 1 : 200)
             }
+            .onChange(of: entry.text, updateLastEdit)
+            .onChange(of: entry.duration, updateLastEdit)
+            .onChange(of: entry.colors, updateLastEdit)
+        }
+        
+        func updateLastEdit(old: Any, new: Any) {
+            entry.lastEdit = .now
+            mergeTimer?.invalidate()
+            mergeTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: false, block: { _ in
+                DispatchQueue(label: "merge queue", qos: .utility).async {
+                    Storage.main.mergeEntries()
+                }
+            })
         }
     }
     
@@ -161,8 +175,9 @@ struct EntryFocusPopup: View {
         entry.duration += 1
         focusHelper.changeStartTime(to: newTime)
         storage.entries[time] = nil
-        storage.saveEntries()
+#if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
     }
     
     func moveEntryStartLater(entry: Entry, time: Int) {
@@ -171,9 +186,10 @@ struct EntryFocusPopup: View {
         storage.entries[newTime] = entry
         entry.duration -= 1
         focusHelper.changeStartTime(to: newTime)
-        storage.entries[time] = Entry("")
-        storage.saveEntries()
+        storage.entries[time] = Entry(blank: true)
+#if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
     }
     
     func moveEntryEndEarlier(entry: Entry, time: Int) {
@@ -181,9 +197,10 @@ struct EntryFocusPopup: View {
         guard storage.entries[nextTime] == nil else { return } // entry was marked nil
         entry.duration -= 1
         focusHelper.adjustScroll()
-        storage.entries[nextTime] = Entry("")
-        storage.saveEntries()
+        storage.entries[nextTime] = Entry(blank: true)
+#if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
     }
     
     func moveEntryEndLater(entry: Entry, time: Int) {
@@ -192,8 +209,9 @@ struct EntryFocusPopup: View {
         entry.duration += 1
         focusHelper.adjustScroll()
         storage.entries[nextTime] = nil
-        storage.saveEntries()
+#if os(iOS)
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
     }
     
     var buttonRow: some View {

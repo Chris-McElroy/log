@@ -10,6 +10,7 @@
 		1E12FA712B3F0D8D002040FD /* EntrySummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E12FA702B3F0D8D002040FD /* EntrySummaryView.swift */; };
 		1E12FA732B3F110F002040FD /* FocusHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E12FA722B3F110F002040FD /* FocusHelper.swift */; };
 		1E12FA752B3F1315002040FD /* EntryFocusPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E12FA742B3F1315002040FD /* EntryFocusPopup.swift */; };
+		1E17FA102B52F75D0073792B /* AnimationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFDB2F62B4209300011A0FF /* AnimationHelper.swift */; };
 		1E78457B2B3CC2470049D31E /* DateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E78457A2B3CC2470049D31E /* DateHelper.swift */; };
 		1E78457D2B3CCADE0049D31E /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E78457C2B3CCADE0049D31E /* Entry.swift */; };
 		1E8401C32AC3427A0034B181 /* logApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8401C22AC3427A0034B181 /* logApp.swift */; };
@@ -18,7 +19,6 @@
 		1E8401CB2AC3427B0034B181 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E8401CA2AC3427B0034B181 /* Preview Assets.xcassets */; };
 		1E8914002B479B0B005F1EC2 /* Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8913FF2B479B0B005F1EC2 /* Categories.swift */; };
 		1EC4A8FD2B1AA8D7003C26A5 /* StorageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */; };
-		1EFDB2F72B4209300011A0FF /* AnimationHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFDB2F62B4209300011A0FF /* AnimationHelper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -167,10 +167,10 @@
 			files = (
 				1E12FA732B3F110F002040FD /* FocusHelper.swift in Sources */,
 				1E78457D2B3CCADE0049D31E /* Entry.swift in Sources */,
+				1E17FA102B52F75D0073792B /* AnimationHelper.swift in Sources */,
 				1E8401C52AC3427A0034B181 /* MainView.swift in Sources */,
 				1E12FA712B3F0D8D002040FD /* EntrySummaryView.swift in Sources */,
 				1E12FA752B3F1315002040FD /* EntryFocusPopup.swift in Sources */,
-				1EFDB2F72B4209300011A0FF /* AnimationHelper.swift in Sources */,
 				1E78457B2B3CC2470049D31E /* DateHelper.swift in Sources */,
 				1E8914002B479B0B005F1EC2 /* Categories.swift in Sources */,
 				1E8401C32AC3427A0034B181 /* logApp.swift in Sources */,
@@ -236,7 +236,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -294,7 +294,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 13.5;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -309,7 +309,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = log/log.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"log/Preview Content\"";
 				DEVELOPMENT_TEAM = A44UN86BN6;
@@ -331,7 +331,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = chris.logapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -352,7 +352,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = log/log.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"log/Preview Content\"";
 				DEVELOPMENT_TEAM = A44UN86BN6;
@@ -374,7 +374,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 13.6;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = chris.logapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
