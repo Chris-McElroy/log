@@ -38,6 +38,7 @@ class DateHelper: ObservableObject {
     }
     
     func changeDay(forward: Bool) {
+        Storage.main.mergeEntries()
         let dateRefDate = Calendar.current.date(from: dateRef) ?? .now
         let newDate = Calendar.current.date(byAdding: .day, value: forward ? 1 : -1, to: dateRefDate) ?? .now
         dateRef = Calendar.current.dateComponents([.year, .month, .day], from: newDate)
@@ -46,6 +47,25 @@ class DateHelper: ObservableObject {
         UserDefaults.standard.setValue(dateRef.year ?? 2024, forKey: "year")
         UserDefaults.standard.setValue(dateRef.month ?? 1, forKey: "month")
         UserDefaults.standard.setValue(dateRef.day ?? 1, forKey: "day")
+        Storage.main.mergeEntries()
+    }
+    
+    func updateDay() {
+        // get the current time minus 4 hours
+        let currentDate = Date.now.advanced(by: -14400)
+        let currentDateRef = Calendar.current.dateComponents([.year, .month, .day], from: currentDate)
+        if currentDateRef == dateRef { return }
+        
+        if !Storage.main.entries.isEmpty { Storage.main.mergeEntries() }
+        
+        dateRef = currentDateRef
+        day = DateHelper.dayString(from: dateRef)
+        
+        UserDefaults.standard.setValue(dateRef.year ?? 2024, forKey: "year")
+        UserDefaults.standard.setValue(dateRef.month ?? 1, forKey: "month")
+        UserDefaults.standard.setValue(dateRef.day ?? 1, forKey: "day")
+        
+        Storage.main.mergeEntries()
     }
     
     func loadTimes(lo: Int?, hi: Int?) -> [Int] {

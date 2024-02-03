@@ -21,20 +21,21 @@ class Storage: ObservableObject {
     private var query: NSMetadataQuery? = nil
     @Published var entries: [Int: Entry] = [:]
     private var data: [String: [String: Any]] = [:]
+    private var entriesDate: String = ""
     private var updateTimer: Timer? = nil
     
-    private func pullData() {
-        guard let dayFile = getDayFile() else { return }
+    private func pullData(for day: String) {
+        guard let dayFile = getDayFile(for: day) else { return }
         
         do {
             let nsData = try NSDictionary(contentsOf: dayFile, error: {}())
-            data[DateHelper.main.day] = Dictionary(_immutableCocoaDictionary: nsData)
+            data[day] = Dictionary(_immutableCocoaDictionary: nsData)
         } catch {
             print("couldn't get contents")
         }
     }
     
-    private func getDayFile() -> URL? {
+    private func getDayFile(for day: String) -> URL? {
         guard let icloudFolder = FileManager.default.url(forUbiquityContainerIdentifier: nil) else {
             print("couldn't get icloud url")
             return nil
@@ -42,8 +43,7 @@ class Storage: ObservableObject {
         
         let documentsFolder = icloudFolder.appendingPathComponent("Documents")
         
-        let dayString = DateHelper.main.day
-        let dateComp = dayString.split(separator: ".")
+        let dateComp = day.split(separator: ".")
         let yearFolder = documentsFolder.appendingPathComponent("data" + dateComp[0])
         let monthFolder = yearFolder.appendingPathComponent("data" + dateComp[0] + "." + dateComp[1])
         
@@ -55,16 +55,16 @@ class Storage: ObservableObject {
             }
         }
         
-        let dayFile = monthFolder.appendingPathComponent("data" + DateHelper.main.day + ".plist")
+        let dayFile = monthFolder.appendingPathComponent("data" + day + ".plist")
         
         return dayFile
     }
     
-    private func getEntries() -> [Int: Entry] {
-        pullData()
+    private func getEntries(for day: String) -> [Int: Entry] {
+        pullData(for: day)
         
         var tempEntries: [Int: Entry] = [:]
-        for (time, entryData) in data[DateHelper.main.day] ?? [:] {
+        for (time, entryData) in data[day] ?? [:] {
             guard let entryDict = entryData as? NSDictionary else { continue }
             tempEntries[Int(time.dropFirst()) ?? 0] = Entry(from: entryDict)
         }
@@ -72,15 +72,15 @@ class Storage: ObservableObject {
         return tempEntries
     }
     
-    func loadEntries() {
-        updateEntries(from: getEntries())
+    private func loadEntries(for day: String) {
+        updateEntries(from: getEntries(for: day), for: day)
         
         if let time = FocusHelper.main.time {
             FocusHelper.main.changeTime(to: time, animate: true)
         }
     }
     
-    private func updateEntries(from dict: [Int: Entry]) {
+    private func updateEntries(from dict: [Int: Entry], for day: String) {
         var tempEntries = dict
         
         let timeList = DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
@@ -97,21 +97,23 @@ class Storage: ObservableObject {
         }
         
         DispatchQueue.main.async {
+            self.entriesDate = day
             self.entries = tempEntries
         }
     }
     
     func mergeEntries() {
-        guard !entries.isEmpty else { loadEntries(); return }
+        guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
         
         startUpdateTimer()
         
-        let onlineEntries = getEntries()
+        let day = entriesDate
+        let onlineEntries = getEntries(for: day)
             
         let onlineEntrySet = getEntrySet(from: onlineEntries)
         let localEntrySet = getEntrySet(from: entries)
         
-        guard localEntrySet != onlineEntrySet else { print("not saving"); return }
+        guard localEntrySet != onlineEntrySet else { return }
         
         let localDifference = localEntrySet.subtracting(onlineEntrySet)
         let onlineDifference = onlineEntrySet.subtracting(localEntrySet)
@@ -120,22 +122,11 @@ class Storage: ObservableObject {
         let onlineTimes = onlineDifference.map { $0.time }
         
         if onlineTimes == localTimes {
-            var allEmpty = true
-            for time in localTimes {
-                if onlineEntries[time]?.isEmpty() != true || entries[time]?.isEmpty() != true {
-                    allEmpty = false
-                    break
-                }
-            }
-            if allEmpty {
-                print("not saving 2")
+            // only save if any of the differences are not empty entries; nil and empty are both ignored
+            if localTimes.filter({ onlineEntries[$0]?.isEmpty() == false || entries[$0]?.isEmpty() == false }).isEmpty {
                 return
             }
         }
-        
-        print("saving")
-        print(localEntrySet.subtracting(onlineEntrySet).map { ($0.time, $0.entry.text, $0.entry.lastEdit!.timeIntervalSinceNow) })
-        print(onlineEntrySet.subtracting(localEntrySet).map { ($0.time, $0.entry.text, $0.entry.lastEdit!.timeIntervalSinceNow) })
         
         let entrySet = onlineEntrySet.union(localEntrySet)
         
@@ -144,26 +135,25 @@ class Storage: ObservableObject {
         })
         
         var currentTimes: Set<Int> = []
-        let dayString = DateHelper.main.day
-        data[dayString] = [:] // resetting so that nil entries are not kept
+        data[day] = [:] // resetting so that nil entries are not kept
         var newEntries: [Int: Entry] = [:]
         
         for info in entryList {
             if currentTimes.isDisjoint(with: info.times) {
                 currentTimes.formUnion(info.times)
-                data[dayString]?["g\(info.time)"] = info.entry.toDict()
+                data[day]?["g\(info.time)"] = info.entry.toDict()
                 newEntries[info.time] = info.entry
             }
         }
         
-        updateEntries(from: newEntries)
+        updateEntries(from: newEntries, for: day)
         
-        guard let dayFile = getDayFile() else { return }
+        guard let dayFile = getDayFile(for: day) else { return }
         do {
-            try NSDictionary(dictionary: data[dayString] ?? [:], copyItems: false).write(to: dayFile)
+            try NSDictionary(dictionary: data[day] ?? [:], copyItems: false).write(to: dayFile)
         }
         catch {
-            print("couldn't write", dayString, error.localizedDescription)
+            print("couldn't write", day, error.localizedDescription)
         }
         
         struct EntryInfo: Hashable {

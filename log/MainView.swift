@@ -31,9 +31,7 @@ struct MainView: View {
         .scrollContentBackground(.hidden)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
-                storage.mergeEntries()
                 dateHelper.changeDay(forward: drag.translation.width < 0)
-                storage.loadEntries()
             }
         )
     }

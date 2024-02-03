@@ -32,10 +32,13 @@ struct logApp: App {
                 .onReceive(NotificationCenter.default.publisher(for: activeNotification)) { _ in
                     Storage.main.mergeEntries()
                     DateHelper.main.startTimeSlotTimer()
+                    if (lastActive?.timeIntervalSinceNow ?? -100000) < -10800 {
+                        DateHelper.main.updateDay()
+                    }
                     if (lastActive?.timeIntervalSinceNow ?? -100000) > -300 { return }
                     if let currentTime = DateHelper.main.getCurrentTimeSlot() {
                         Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { _ in
-                            FocusHelper.main.changeTime(to: currentTime, animate: false) // TODO move this to mainview
+                            FocusHelper.main.changeTime(to: currentTime, animate: false)
                         })
                     }
                 }
@@ -45,7 +48,6 @@ struct logApp: App {
                     DateHelper.main.stopTimeSlotTimer()
                     Storage.main.stopUpdateTimer()
                 }
-            // laterDo force restart MainView when calendar (ie time zone) changes
         }
     }
 }
