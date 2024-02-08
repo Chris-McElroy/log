@@ -5,7 +5,7 @@
 //  Created by 4 on 2023.12.27.
 //
 
-import Foundation
+import SwiftUI
 
 class DateHelper: ObservableObject {
     static var main = DateHelper()
@@ -39,6 +39,9 @@ class DateHelper: ObservableObject {
     
     func changeDay(forward: Bool) {
         Storage.main.mergeEntries()
+        withAnimation(.easeInOut(duration: 0.1)) {
+            FocusHelper.main.changeTime(to: nil)
+        }
         let dateRefDate = Calendar.current.date(from: dateRef) ?? .now
         let newDate = Calendar.current.date(byAdding: .day, value: forward ? 1 : -1, to: dateRefDate) ?? .now
         dateRef = Calendar.current.dateComponents([.year, .month, .day], from: newDate)
