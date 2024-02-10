@@ -20,23 +20,30 @@ struct MainView: View {
                     dayTitle
                     entriesList
                 }
+                VStack(spacing: 0) {
+                    Spacer()
+                    colorButtons
+                    Color.black.frame(height: 110)
+                }
+                .offset(y: focusHelper.focus ? 0 : 400)
+                .animation(.easeInOut(duration: 0.3), value: focusHelper.focus)
             }
 #if os(iOS)
             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
 #endif
         }
         .scrollContentBackground(.hidden)
-//        .gesture(DragGesture(minimumDistance: 20)
-//            .onEnded { drag in
-//                dateHelper.changeDay(forward: drag.translation.width < 0)
-//            }
-//        )
+        .gesture(DragGesture(minimumDistance: 20)
+            .onEnded { drag in
+                dateHelper.changeDay(forward: drag.translation.width < 0)
+            }
+        )
     }
     
     var dayTitle: some View {
         Text(dateHelper.day)
             .font(Font.custom("Baskerville", size: 20.0))
-            .padding(.vertical, 10)
+            .padding(.vertical, 5)
     }
     
     var entriesList: some View {
@@ -87,6 +94,11 @@ struct MainView: View {
                         Color.white.frame(width: 1)
                     }
                 }
+                .onTapGesture {
+                    withAnimation {
+                        focusHelper.changeTime(to: nil)
+                    }
+                }
                 .frame(width: 40, height: 20)
                 .padding(.bottom, (focusHelper.time ?? 0) + ((storage.entries[focusHelper.time ?? 0]?.duration ?? 0) - 1)*900 == time && focusHelper.focus ? 150 : 0)
                 .id(time)
@@ -103,6 +115,49 @@ struct MainView: View {
                         .padding(.bottom, focusHelper.time == time && focusHelper.focus ? 150 : 0)
                 }
             }
+        }
+    }
+    
+    var colorButtons: some View {
+        Grid(horizontalSpacing: 0, verticalSpacing: 0) {
+            if let time = focusHelper.time, let entry = storage.entries[time] {
+                ForEach(0..<4) { row in
+                    GridRow {
+                        ForEach(0..<4) { column in
+                            ColorButton(num: Categories.numFromPos[row][column], entry: entry)
+                                .frame(height: 70)
+                        }
+                    }
+                }
+            }
+        }
+        .frame(height: 280)
+    }
+    
+    struct ColorButton: View {
+        let num: Int
+        let name: String
+        let color: Color
+        @ObservedObject var entry: Entry
+        
+        init(num: Int, entry: Entry) {
+            self.num = num
+            name =  Categories.names[num]
+            color = Categories.colors[num]
+            self.entry = entry
+        }
+        
+        var body: some View {
+            Text(entry.colors.contains(num) ? name : "")
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(entry.colors.contains(num) ? Color.black : color)
+                .onTapGesture {
+                    if entry.colors.contains(num) {
+                        entry.colors.remove(num)
+                    } else {
+                        entry.colors.insert(num)
+                    }
+                }
         }
     }
 }

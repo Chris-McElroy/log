@@ -20,8 +20,7 @@ class FocusHelper: ObservableObject {
     
     func changeTime(to time: Int?, animate: Bool = true) {
         withAnimation {
-            if self.time == time { focus.toggle(); return }
-            else { focus = false }
+            focus = false
         }
         newTime = time
         let wasEditing = editingText
@@ -37,9 +36,6 @@ class FocusHelper: ObservableObject {
             }
             withAnimation {
                 self.time = new
-            }
-            if Storage.main.entries[new]?.text == "" && !wasEditing {
-                Storage.main.entries[new]?.text = promptText
             }
             editingText = wasEditing
 //            adjustScroll(animate: animate)

@@ -25,9 +25,7 @@ struct EntryFocusView: View {
                 focusHelper.editingColors = false
                 
                 if isFocused && entry.text == promptText {
-                    entry.text = ""
-                } else if !isFocused && entry.text == "" {
-                    entry.text = promptText
+                    entry.text = "" // TODO weed out prompttext in loading
                 }
                 focusHelper.adjustScroll()
             }

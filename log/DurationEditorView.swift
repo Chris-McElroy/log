@@ -21,15 +21,21 @@ struct DurationEditorView: View {
         VStack(spacing: 0) {
             if focusHelper.time != nil && !focusHelper.focus {
                 Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*20)
-                VStack(spacing: 0) {
-                    Color.black.opacity(0.0001)
-                        .gesture(changeEntryStartGesture)
-                        .onAppear {
-                            print("apper 2")
+                HStack(spacing: 0) {
+                    Spacer().frame(width: 40)
+                    VStack(spacing: 0) { // select/edit duration if entry is tapped/draged
+                        Color.black.opacity(0.0001)
+                            .gesture(changeEntryStartGesture)
+                        Color.black.opacity(0.0001)
+                            .gesture(changeEntryDurationGesture)
+                    }
+                    .onTapGesture(count: 1) {
+                        withAnimation {
+                            focusHelper.focus.toggle()
                         }
-                    Color.black.opacity(0.0001)
-                        .gesture(changeEntryDurationGesture)
+                    }
                 }
+                .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
                 .frame(height: CGFloat(entry.duration)*20)
             }
             Spacer()
