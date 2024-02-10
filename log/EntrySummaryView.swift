@@ -9,23 +9,27 @@ import SwiftUI
 
 struct EntrySummaryView: View {
     @State var time: Int
+    
     @ObservedObject var entry: Entry
     @ObservedObject var storage: Storage = Storage.main
     @ObservedObject var dateHelper: DateHelper = DateHelper.main
     @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
     
     var body: some View {
-        VStack(spacing: 0) {
-            if dateHelper.hourStrings[time] != nil {
-                Color.white.frame(height: 1)
+        ZStack {
+            VStack(spacing: 0) {
+                if dateHelper.hourStrings[time] != nil {
+                    Color.white.frame(height: 1)
+                }
+                HStack(spacing: 0) {
+                    Text(focusHelper.time == time && focusHelper.focus ? dateHelper.getTimeString() : entry.text)
+                        .lineLimit(1)
+                        .foregroundStyle(Color.white)
+                        .padding(.horizontal, 6)
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            HStack(spacing: 0) {
-                Text(focusHelper.time == time && focusHelper.focus ? dateHelper.getTimeString() : entry.text)
-                    .lineLimit(1)
-                    .foregroundStyle(Color.white)
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background {
             if entry.colors.isEmpty {
@@ -46,6 +50,8 @@ struct EntrySummaryView: View {
                 focusHelper.changeTime(to: time)
             }
         }
-        
+        .onChange(of: entry.text, entry.updateLastEdit)
+        .onChange(of: entry.duration, entry.updateLastEdit)
+        .onChange(of: entry.colors, entry.updateLastEdit)
     }
 }

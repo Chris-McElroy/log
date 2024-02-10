@@ -19,7 +19,7 @@ class FocusHelper: ObservableObject {
     @Published var newTime: Int? = nil
     
     func changeTime(to time: Int?, animate: Bool = true) {
-        withAnimation(.easeIn(duration: 0.5)) {
+        withAnimation {
             if self.time == time { focus.toggle(); return }
             else { focus = false }
         }
@@ -55,7 +55,7 @@ class FocusHelper: ObservableObject {
     
     func changeStartTime(to time: Int) {
         self.time = time
-        adjustScroll()
+//        adjustScroll()
     }
     
     func adjustScroll(animate: Bool = true) {

@@ -68,4 +68,9 @@ class Entry: ObservableObject, Equatable, Hashable {
         }
         return NSDictionary(dictionary: tempDict)
     }
+    
+    func updateLastEdit(old: Any, new: Any) {
+        lastEdit = .now
+        Storage.main.startUpdateTimer(after: 1)
+    }
 }
