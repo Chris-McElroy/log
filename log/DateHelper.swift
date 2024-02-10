@@ -13,7 +13,7 @@ class DateHelper: ObservableObject {
     @Published var day: String
     @Published var times: [Int] = []
     @Published var hourStrings: [Int: String] = [:]
-    @Published var currentTimeSlot: Int? = nil
+//    @Published var currentTimeSlot: Int? = nil
     private var dateRef: DateComponents
     private var timeSlotTimer: Timer? = nil
     
@@ -94,29 +94,29 @@ class DateHelper: ObservableObject {
         
         self.times = tempTimes
         self.hourStrings = tempHourStrings
-        self.currentTimeSlot = self.getCurrentTimeSlot()
+//        self.currentTimeSlot = self.getCurrentTimeSlot()
         
         return tempTimes
     }
     
-    func startTimeSlotTimer() {
-        let minute = Calendar.current.dateComponents([.minute], from: .now).minute ?? 0
-        let nextSlotMinute = ((minute/15 + 1)*15) % 60
-        let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: nextSlotMinute), matchingPolicy: .nextTime) ?? .now
-        
-        timeSlotTimer?.invalidate()
-        timeSlotTimer = Timer.init(fire: nextSlotTime, interval: 2, repeats: true, block: { _ in
-            self.currentTimeSlot = self.getCurrentTimeSlot()
-        })
-        if let timeSlotTimer {
-            RunLoop.current.add(timeSlotTimer, forMode: .common)
-        }
-    }
+//    func startTimeSlotTimer() {
+//        let minute = Calendar.current.dateComponents([.minute], from: .now).minute ?? 0
+//        let nextSlotMinute = ((minute/15 + 1)*15) % 60
+//        let nextSlotTime = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: nextSlotMinute), matchingPolicy: .nextTime) ?? .now
+//        
+//        timeSlotTimer?.invalidate()
+//        timeSlotTimer = Timer.init(fire: nextSlotTime, interval: 2, repeats: true, block: { _ in
+//            self.currentTimeSlot = self.getCurrentTimeSlot()
+//        })
+//        if let timeSlotTimer {
+//            RunLoop.current.add(timeSlotTimer, forMode: .common)
+//        }
+//    }
     
-    func stopTimeSlotTimer() {
-        timeSlotTimer?.invalidate()
-        timeSlotTimer = nil
-    }
+//    func stopTimeSlotTimer() {
+//        timeSlotTimer?.invalidate()
+//        timeSlotTimer = nil
+//    }
     
     func getTimeString() -> String {
         let offset = DateHelper.timeZoneOffset()
@@ -135,24 +135,23 @@ class DateHelper: ObservableObject {
         return startString + " - " + endString
     }
     
-    func getCurrentTimeSlot() -> Int? {
-        let now = Date.now
-        let todayRef = Calendar.current.dateComponents([.year, .month, .day], from: now)
+    func getPertinentSlot() -> Int? {
+        let pertinentTime = Date.now.advanced(by: -300)
+        let todayRef = Calendar.current.dateComponents([.year, .month, .day], from: pertinentTime)
         
-        let currentTimeToday = (Int(now.timeIntervalSince(Calendar.current.startOfDay(for: now))) - DateHelper.timeZoneOffset())/900*900
+        let currentTimeToday = (Int(pertinentTime.timeIntervalSince(Calendar.current.startOfDay(for: pertinentTime))) - DateHelper.timeZoneOffset())/900*900
         
         if dateRef == todayRef {
             return currentTimeToday
         }
         
-        
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: now) ?? .now
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: pertinentTime) ?? pertinentTime
         let tomorrowRef = Calendar.current.dateComponents([.year, .month, .day], from: tomorrow)
         if dateRef == tomorrowRef && times.contains(currentTimeToday - 86400) {
             return currentTimeToday - 86400
         }
         
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: now) ?? .now
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: pertinentTime) ?? pertinentTime
         let yesterdayRef = Calendar.current.dateComponents([.year, .month, .day], from: yesterday)
         if dateRef == yesterdayRef && times.contains(currentTimeToday + 86400) {
             return currentTimeToday + 86400

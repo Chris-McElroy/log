@@ -21,6 +21,7 @@ class FocusHelper: ObservableObject {
     func changeTime(to time: Int?, animate: Bool = true) {
         withAnimation(animate ? .default : nil) {
             focus = false
+            adjustScroll()
         }
         newTime = time
         let wasEditing = editingText
@@ -39,7 +40,7 @@ class FocusHelper: ObservableObject {
                 self.time = new
             }
             editingText = wasEditing
-//            adjustScroll(animate: animate)
+            adjustScroll(animate: animate)
         } else {
             self.time = time
         }
@@ -47,19 +48,23 @@ class FocusHelper: ObservableObject {
     
     func changeStartTime(to time: Int) {
         self.time = time
-//        adjustScroll()
+        adjustScroll()
     }
     
     func adjustScroll(animate: Bool = true) {
-        guard let time = time else { return }
-        let topDistance = (editingText || editingColors) ? 1 : (editingDuration ? 16 - ((Storage.main.entries[time]?.duration ?? 1))/2 : 5)
-        let topTime = max(DateHelper.main.times.min() ?? 0, time - topDistance*900)
-        if animate {
-            withAnimation {
-                scrollProxy?.scrollTo(topTime, anchor: .top)
-            }
-        } else {
-            scrollProxy?.scrollTo(topTime, anchor: .top)
+        guard let time = time, let entry = Storage.main.entries[time] else { return }
+        let bottomTime = time + entry.duration*900
+//        let topDistance = (editingText || editingColors) ? 1 : (editingDuration ? 16 - ((Storage.main.entries[time]?.duration ?? 1))/2 : 5)
+//        let topTime = max(DateHelper.main.times.min() ?? 0, time - topDistance*900)
+#if os(iOS)
+        let anchorPoint = focus ? UnitPoint.center : UnitPoint.center
+        let anchorTime = bottomTime // focus ? max(DateHelper.main.times.min() ?? 0, time + ((Storage.main.entries[time]?.duration ?? 0) - 3)*900) : time
+#elseif os(macOS)
+        let anchorPoint = UnitPoint.center
+        let anchorTime = bottomTime
+#endif
+        withAnimation(animate ? .default : nil) {
+            scrollProxy?.scrollTo(anchorTime, anchor: anchorPoint)
         }
     }
 }

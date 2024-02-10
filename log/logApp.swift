@@ -12,13 +12,9 @@ struct logApp: App {
     @State var lastActive: Date? = nil
 #if os(iOS)
     let activeNotification = UIApplication.didBecomeActiveNotification
-#elseif os(macOS)
-    let activeNotification = NSApplication.willBecomeActiveNotification
-#endif
-    
-#if os(iOS)
     let resignNotification = UIApplication.willResignActiveNotification
 #elseif os(macOS)
+    let activeNotification = NSApplication.willBecomeActiveNotification
     let resignNotification = NSApplication.willResignActiveNotification
 #endif
     
@@ -30,21 +26,21 @@ struct logApp: App {
 
                 .onReceive(NotificationCenter.default.publisher(for: activeNotification)) { _ in
                     Storage.main.mergeEntries()
-                    DateHelper.main.startTimeSlotTimer()
+//                    DateHelper.main.startTimeSlotTimer()
                     if (lastActive?.timeIntervalSinceNow ?? -100000) < -10800 {
                         DateHelper.main.updateDay()
                     }
                     if (lastActive?.timeIntervalSinceNow ?? -100000) > -300 { return }
-                    if let currentTime = DateHelper.main.getCurrentTimeSlot() {
-                        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false, block: { _ in
-                            FocusHelper.main.changeTime(to: currentTime, animate: false)
-                        })
+                    if let currentTime = DateHelper.main.getPertinentSlot() {
+                        FocusHelper.main.changeTime(to: currentTime, animate: false)
+                        FocusHelper.main.focus = true
+                        FocusHelper.main.adjustScroll(animate: false)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: resignNotification)) { _ in
                     lastActive = .now
                     Storage.main.mergeEntries()
-                    DateHelper.main.stopTimeSlotTimer()
+//                    DateHelper.main.stopTimeSlotTimer()
                     Storage.main.stopUpdateTimer()
                 }
         }

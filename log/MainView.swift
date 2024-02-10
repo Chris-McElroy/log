@@ -39,9 +39,10 @@ struct MainView: View {
                 if !focusHelper.editingText {
                     colorButtons.opacity(0)
                     dayButtons.opacity(0)
-                    switchEntryButtons.opacity(0)
+                    switchEntryWithArrowButtons.opacity(0)
                 }
                 focusButtons.opacity(0)
+                switchEntryWithDButtons.opacity(0)
 #endif
             }
 #if os(iOS)
@@ -208,7 +209,7 @@ struct MainView: View {
         }
     }
     
-    var switchEntryButtons: some View {
+    var switchEntryWithArrowButtons: some View {
         VStack(spacing: 0) {
             Button("previous entry") {
                 if var time = focusHelper.time {
@@ -233,6 +234,31 @@ struct MainView: View {
         }
     }
     
+    var switchEntryWithDButtons: some View {
+        VStack(spacing: 0) {
+            Button("previous entry") {
+                if var time = focusHelper.time {
+                    repeat {
+                        time -= 900
+                        guard dateHelper.times.contains(time) else { return }
+                    } while storage.entries[time] == nil
+                    focusHelper.changeTime(to: time, animate: false)
+                }
+            }
+            .keyboardShortcut("d", modifiers: [.command, .option])
+            Button("next entry") {
+                if var time = focusHelper.time {
+                    repeat {
+                        time += 900
+                        guard dateHelper.times.contains(time) else { return }
+                    } while storage.entries[time] == nil
+                    focusHelper.changeTime(to: time, animate: false)
+                }
+            }
+            .keyboardShortcut("d", modifiers: [.command])
+        }
+    }
+    
     var focusButtons: some View {
         VStack(spacing: 0) {
             Button("focus") {
@@ -240,10 +266,13 @@ struct MainView: View {
                     return
                 } else if focusHelper.focus {
                     focusHelper.editingText = true
-                } else {
+                } else if focusHelper.time != nil {
                     withAnimation {
                         focusHelper.focus = true
+                        focusHelper.adjustScroll()
                     }
+                } else {
+                    focusHelper.changeTime(to: dateHelper.getPertinentSlot())
                 }
             }
             .keyboardShortcut("e", modifiers: [.command])
@@ -253,6 +282,7 @@ struct MainView: View {
                 } else if focusHelper.focus {
                     withAnimation {
                         focusHelper.focus = false
+                        focusHelper.adjustScroll()
                     }
                 } else {
                     withAnimation {

@@ -32,14 +32,25 @@ struct DurationEditorView: View {
                     .onTapGesture(count: 1) {
                         withAnimation {
                             focusHelper.focus.toggle()
+                            focusHelper.adjustScroll()
                         }
                     }
                 }
-                .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
                 .frame(height: CGFloat(entry.duration)*slotHeight)
+                Spacer()
+            } else if focusHelper.time != nil && focusHelper.editingText {
+                VStack(spacing: 0) {
+                    Color.black.opacity(0.0001)
+                        .frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
+                    Spacer().frame(height: 150)
+                    Color.black.opacity(0.0001)
+                }
+                .onTapGesture {
+                    focusHelper.editingText = false
+                }
             }
-            Spacer()
         }
+        .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
     }
     
     var changeEntryStartGesture: some Gesture {
