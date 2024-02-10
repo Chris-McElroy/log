@@ -114,6 +114,8 @@
 			dependencies = (
 			);
 			name = log;
+			packageProductDependencies = (
+			);
 			productName = log;
 			productReference = 1E8401BF2AC3427A0034B181 /* log.app */;
 			productType = "com.apple.product-type.application";
@@ -142,6 +144,8 @@
 				Base,
 			);
 			mainGroup = 1E8401B62AC3427A0034B181;
+			packageReferences = (
+			);
 			productRefGroup = 1E8401C02AC3427A0034B181 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";

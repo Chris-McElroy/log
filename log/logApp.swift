@@ -26,7 +26,6 @@ struct logApp: App {
         WindowGroup {
             MainView()
                 .font(Font.custom("Baskerville", size: 14.0))
-                .buttonStyle(PlainButtonStyle())
                 .background(Color.black, ignoresSafeAreaEdges: .all)
 
                 .onReceive(NotificationCenter.default.publisher(for: activeNotification)) { _ in

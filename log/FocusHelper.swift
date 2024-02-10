@@ -19,7 +19,7 @@ class FocusHelper: ObservableObject {
     @Published var newTime: Int? = nil
     
     func changeTime(to time: Int?, animate: Bool = true) {
-        withAnimation {
+        withAnimation(animate ? .default : nil) {
             focus = false
         }
         newTime = time
@@ -34,16 +34,12 @@ class FocusHelper: ObservableObject {
             while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
                 new -= 900
             }
-            withAnimation {
+            
+            withAnimation(animate ? .default : nil) {
                 self.time = new
             }
             editingText = wasEditing
 //            adjustScroll(animate: animate)
-            
-            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false, block: { _ in
-                guard self.newTime == time else { return }
-//                withAnimation { self.focus = true }
-            })
         } else {
             self.time = time
         }

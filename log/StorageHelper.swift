@@ -75,8 +75,6 @@ class Storage: ObservableObject {
     private func loadEntries(for day: String) {
         updateEntries(from: getEntries(for: day), for: day)
         
-        print("loading", entries.count, day)
-        
         if let time = FocusHelper.main.time {
             FocusHelper.main.changeTime(to: time, animate: true)
         }
@@ -98,9 +96,6 @@ class Storage: ObservableObject {
                 tempEntries[time] = Entry()
             }
         }
-        
-        
-        print("updating", dict.count, day, "entries", entries.count, entries.filter { !$0.value.isEmpty() }.count, "temp", tempEntries.count, tempEntries.filter { !$0.value.isEmpty() }.count)
         
         self.entriesDate = day
         self.entries = tempEntries
@@ -186,8 +181,6 @@ class Storage: ObservableObject {
     func startUpdateTimer(after wait: TimeInterval = 5) {
         updateTimer?.invalidate()
         updateTimer = Timer.scheduledTimer(withTimeInterval: wait, repeats: false, block: { _ in
-            print("timer", self.entriesDate, self.entries.count, self.entries.filter { !$0.value.isEmpty() }.count)
-            
             DispatchQueue.main.async {
                 self.mergeEntries()
             }

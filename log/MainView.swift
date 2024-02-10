@@ -20,6 +20,7 @@ struct MainView: View {
                     dayTitle
                     entriesList
                 }
+#if os(iOS)
                 VStack(spacing: 0) {
                     Spacer()
                     colorButtons
@@ -27,17 +28,27 @@ struct MainView: View {
                 }
                 .offset(y: focusHelper.focus ? 0 : 400)
                 .animation(.easeInOut(duration: 0.3), value: focusHelper.focus)
+#elseif os(macOS)
+                if !focusHelper.editingText {
+                    colorButtons.opacity(0)
+                    dayButtons.opacity(0)
+                    switchEntryButtons.opacity(0)
+                }
+                focusButtons.opacity(0)
+#endif
             }
 #if os(iOS)
             .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
 #endif
         }
         .scrollContentBackground(.hidden)
+#if os(iOS)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
                 dateHelper.changeDay(forward: drag.translation.width < 0)
             }
         )
+#endif
     }
     
     var dayTitle: some View {
@@ -148,16 +159,87 @@ struct MainView: View {
         }
         
         var body: some View {
-            Text(entry.colors.contains(num) ? name : "")
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(entry.colors.contains(num) ? Color.black : color)
-                .onTapGesture {
-                    if entry.colors.contains(num) {
-                        entry.colors.remove(num)
-                    } else {
-                        entry.colors.insert(num)
+            Button(action: {
+                if entry.colors.contains(num) {
+                    entry.colors.remove(num)
+                } else {
+                    entry.colors.insert(num)
+                }
+            }) {
+                Text(entry.colors.contains(num) ? name : "")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(entry.colors.contains(num) ? Color.black : color)
+            }
+            .keyboardShortcut(Categories.keyFromNum[num], modifiers: [])
+        }
+    }
+    
+    var dayButtons: some View {
+        VStack(spacing: 0) {
+            Button("previous day") {
+                dateHelper.changeDay(forward: false)
+            }
+            .keyboardShortcut(.leftArrow, modifiers: [])
+            Button("next day") {
+                dateHelper.changeDay(forward: true)
+            }
+            .keyboardShortcut(.rightArrow, modifiers: [])
+        }
+    }
+    
+    var switchEntryButtons: some View {
+        VStack(spacing: 0) {
+            Button("previous entry") {
+                if var time = focusHelper.time {
+                    repeat {
+                        time -= 900
+                        guard dateHelper.times.contains(time) else { return }
+                    } while storage.entries[time] == nil
+                    focusHelper.changeTime(to: time, animate: false)
+                }
+            }
+            .keyboardShortcut(.upArrow, modifiers: [])
+            Button("next entry") {
+                if var time = focusHelper.time {
+                    repeat {
+                        time += 900
+                        guard dateHelper.times.contains(time) else { return }
+                    } while storage.entries[time] == nil
+                    focusHelper.changeTime(to: time, animate: false)
+                }
+            }
+            .keyboardShortcut(.downArrow, modifiers: [])
+        }
+    }
+    
+    var focusButtons: some View {
+        VStack(spacing: 0) {
+            Button("focus") {
+                if focusHelper.editingText {
+                    return
+                } else if focusHelper.focus {
+                    focusHelper.editingText = true
+                } else {
+                    withAnimation {
+                        focusHelper.focus = true
                     }
                 }
+            }
+            .keyboardShortcut("e", modifiers: [.command])
+            Button("unfocus") {
+                if focusHelper.editingText {
+                    focusHelper.editingText = false
+                } else if focusHelper.focus {
+                    withAnimation {
+                        focusHelper.focus = false
+                    }
+                } else {
+                    withAnimation {
+                        focusHelper.changeTime(to: nil)
+                    }
+                }
+            }
+            .keyboardShortcut("e", modifiers: [.command, .option])
         }
     }
 }
