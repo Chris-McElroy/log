@@ -9,6 +9,7 @@ import SwiftUI
 
 struct EntrySummaryView: View {
     @State var time: Int
+    @State var colorsChanged: Bool = false
     
     @ObservedObject var entry: Entry
     @ObservedObject var storage: Storage = Storage.main
@@ -26,25 +27,23 @@ struct EntrySummaryView: View {
                         .lineLimit(1)
                         .foregroundStyle(Color.white)
                         .padding(.horizontal, 6)
-                    Spacer()
+                    Spacer().frame(height: colorsChanged ? 2 : 15)
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onChange(of: entry.colors) { colorsChanged.toggle() }
             }
         }
         .background {
-            if entry.colors.isEmpty {
-                Color.black
-            } else {
-                HStack(spacing: 0) {
-                    ForEach(0..<16) { i in
-                        let color = Categories.displayOrder[i]
-                        if entry.colors.contains(color) {
-                            Categories.colors[color]
-                        }
+            HStack(spacing: 0) {
+                ForEach(0..<16) { i in
+                    let color = Categories.displayOrder[i]
+                    if entry.colors.contains(color) {
+                        Categories.colors[color]
                     }
                 }
             }
         }
+        .background(Color.black)
         .onTapGesture {
             withAnimation {
                 focusHelper.changeTime(to: time)

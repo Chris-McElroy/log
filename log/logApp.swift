@@ -25,7 +25,7 @@ struct logApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
-                .font(Font.custom("Baskerville", size: 14.0))
+                .font(Font.custom("Baskerville", size: fontSize))
                 .background(Color.black, ignoresSafeAreaEdges: .all)
 
                 .onReceive(NotificationCenter.default.publisher(for: activeNotification)) { _ in

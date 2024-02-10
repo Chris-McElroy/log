@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+#if os(iOS)
+let slotHeight: CGFloat = 28
+let fontSize: CGFloat = 15
+#elseif os(macOS)
+let slotHeight: CGFloat = 20
+let fontSize: CGFloat = 13
+#endif
 
 struct MainView: View {
     @ObservedObject var storage = Storage.main
@@ -63,7 +70,7 @@ struct MainView: View {
                 ZStack {
                     if let time = focusHelper.time, focusHelper.focus, let entry = storage.entries[time] {
                         VStack(spacing: 0) {
-                            Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*20)
+                            Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
                             EntryFocusView(entry: entry)
                             Spacer()
                         }
@@ -110,7 +117,7 @@ struct MainView: View {
                         focusHelper.changeTime(to: nil)
                     }
                 }
-                .frame(width: 40, height: 20)
+                .frame(width: 40, height: slotHeight)
                 .padding(.bottom, (focusHelper.time ?? 0) + ((storage.entries[focusHelper.time ?? 0]?.duration ?? 0) - 1)*900 == time && focusHelper.focus ? 150 : 0)
                 .id(time)
             }
@@ -122,7 +129,7 @@ struct MainView: View {
             ForEach(dateHelper.times, id: \.self) { time in
                 if let entry = storage.entries[time] {
                     EntrySummaryView(time: time, entry: entry)
-                        .frame(height: 20*CGFloat(entry.duration))
+                        .frame(height: slotHeight*CGFloat(entry.duration))
                         .padding(.bottom, focusHelper.time == time && focusHelper.focus ? 150 : 0)
                 }
             }
@@ -143,6 +150,7 @@ struct MainView: View {
             }
         }
         .frame(height: 280)
+        .background(Color.black)
     }
     
     struct ColorButton: View {
@@ -150,6 +158,7 @@ struct MainView: View {
         let name: String
         let color: Color
         @ObservedObject var entry: Entry
+        @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
         
         init(num: Int, entry: Entry) {
             self.num = num
@@ -159,18 +168,30 @@ struct MainView: View {
         }
         
         var body: some View {
-            Button(action: {
-                if entry.colors.contains(num) {
-                    entry.colors.remove(num)
-                } else {
-                    entry.colors.insert(num)
-                }
-            }) {
-                Text(entry.colors.contains(num) ? name : "")
+#if os(iOS)
+            ZStack {
+                Text(name)
+                    .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(entry.colors.contains(num) ? Color.black : color)
+                if !entry.colors.contains(num) {
+                    color
+                }
             }
-            .keyboardShortcut(Categories.keyFromNum[num], modifiers: [])
+            .animation(nil, value: FocusHelper.main.time)
+            .onTapGesture(perform: changeColor)
+#elseif os(macOS)
+            Button(name, action: changeColor)
+                .keyboardShortcut(Categories.keyFromNum[num], modifiers: [])
+#endif
+        }
+        
+        func changeColor() {
+            guard let time = focusHelper.time, let entry = Storage.main.entries[time] else { return }
+            if entry.colors.contains(num) {
+                entry.colors.remove(num)
+            } else {
+                entry.colors.insert(num)
+            }
         }
     }
     

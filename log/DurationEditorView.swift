@@ -20,7 +20,7 @@ struct DurationEditorView: View {
     var body: some View {
         VStack(spacing: 0) {
             if focusHelper.time != nil && !focusHelper.focus {
-                Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*20)
+                Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*slotHeight)
                 HStack(spacing: 0) {
                     Spacer().frame(width: 40)
                     VStack(spacing: 0) { // select/edit duration if entry is tapped/draged
@@ -36,7 +36,7 @@ struct DurationEditorView: View {
                     }
                 }
                 .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
-                .frame(height: CGFloat(entry.duration)*20)
+                .frame(height: CGFloat(entry.duration)*slotHeight)
             }
             Spacer()
         }
@@ -99,7 +99,7 @@ struct DurationEditorView: View {
     func scrollingUp(for drag: DragGesture.Value) -> Bool? {
         let height = drag.translation.height
         let travel = height - (lastDragHeight ?? 0)
-        if abs(travel) > 20 {
+        if abs(travel) > slotHeight {
             lastDragHeight = height
             return travel < 0
         }
