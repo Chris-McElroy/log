@@ -17,19 +17,18 @@ struct EntrySummaryView: View {
     var body: some View {
         VStack(spacing: 0) {
             if dateHelper.hourStrings[time] != nil {
-                Color.white
-                    .frame(height: 1)
+                Color.white.frame(height: 1)
             }
-            Text(entry.text == promptText ? "" : entry.text)
-                .lineLimit(1)
-                .foregroundStyle(focusHelper.time == time ? Color.black : Color.white)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            HStack(spacing: 0) {
+                Text(focusHelper.time == time && focusHelper.focus ? dateHelper.getTimeString() : entry.text)
+                    .lineLimit(1)
+                    .foregroundStyle(Color.white)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 20*CGFloat(entry.duration))
         .background {
-            if focusHelper.time == time {
-                Color.white // Color(hue: 0, saturation: 0, brightness: 0.34)
-            } else if entry.colors.isEmpty {
+            if entry.colors.isEmpty {
                 Color.black
             } else {
                 HStack(spacing: 0) {

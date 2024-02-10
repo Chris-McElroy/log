@@ -15,8 +15,15 @@ class FocusHelper: ObservableObject {
     @Published var editingDuration: Bool = false
     @Published var scrollProxy: ScrollViewProxy? = nil
     @Published var time: Int? = nil
+    @Published var focus: Bool = false
+    @Published var newTime: Int? = nil
     
     func changeTime(to time: Int?, animate: Bool = true) {
+        withAnimation(.easeIn(duration: 0.5)) {
+            if self.time == time { focus.toggle(); return }
+            else { focus = false }
+        }
+        newTime = time
         let wasEditing = editingText
         editingText = false // otherwise text editor edits the old text
         
@@ -28,12 +35,19 @@ class FocusHelper: ObservableObject {
             while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
                 new -= 900
             }
-            self.time = new
+            withAnimation {
+                self.time = new
+            }
             if Storage.main.entries[new]?.text == "" && !wasEditing {
                 Storage.main.entries[new]?.text = promptText
             }
             editingText = wasEditing
-            adjustScroll(animate: animate)
+//            adjustScroll(animate: animate)
+            
+            Timer.scheduledTimer(withTimeInterval: 0.4, repeats: false, block: { _ in
+                guard self.newTime == time else { return }
+//                withAnimation { self.focus = true }
+            })
         } else {
             self.time = time
         }

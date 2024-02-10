@@ -9,6 +9,42 @@ import SwiftUI
 
 let promptText = "tap to edit"
 
+struct EntryFocusView: View {
+    @ObservedObject var entry: Entry
+    @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
+    @FocusState var isFocused: Bool
+    
+    var body: some View {
+        TextEditor(text: $entry.text)
+            .multilineTextAlignment(.leading)
+            .focused($isFocused)
+            .onChange(of: isFocused) {
+                focusHelper.editingText = isFocused
+                focusHelper.editingColors = false
+                
+                if isFocused && entry.text == promptText {
+                    entry.text = ""
+                } else if !isFocused && entry.text == "" {
+                    entry.text = promptText
+                }
+                focusHelper.adjustScroll()
+            }
+            .onChange(of: focusHelper.editingText) {
+                isFocused = focusHelper.editingText
+            }
+            .padding(.vertical, 10)
+            .frame(height: focusHelper.editingDuration ? 1 : 150)
+            .onChange(of: entry.text, updateLastEdit)
+            .onChange(of: entry.duration, updateLastEdit)
+            .onChange(of: entry.colors, updateLastEdit)
+    }
+    
+    func updateLastEdit(old: Any, new: Any) {
+        entry.lastEdit = .now
+        Storage.main.startUpdateTimer(after: 1)
+    }
+}
+
 struct EntryFocusPopup: View {
     @State var lastDragHeight: CGFloat? = nil
     @State var movingStart: Bool? = nil
@@ -33,56 +69,6 @@ struct EntryFocusPopup: View {
             .background(Color.black)
         }
         .offset(x: 0, y: focusHelper.time == nil ? 200 : 105)
-    }
-    
-    struct EntryFocusView: View {
-        @ObservedObject var entry: Entry
-        @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
-        @FocusState var isFocused: Bool
-        
-        var body: some View {
-            VStack(spacing: 0) {
-                Text(DateHelper.main.getTimeString())
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background {
-                        HStack(spacing: 0) {
-                            ForEach(0..<16) { i in
-                                let color = Categories.displayOrder[i]
-                                if entry.colors.contains(color) {
-                                    Categories.colors[color]
-                                }
-                            }
-                        }
-                    }
-                TextEditor(text: $entry.text)
-                    .multilineTextAlignment(.center)
-                    .focused($isFocused)
-                    .onChange(of: isFocused) {
-                        focusHelper.editingText = isFocused
-                        focusHelper.editingColors = false
-                        
-                        if isFocused && entry.text == promptText {
-                            entry.text = ""
-                        } else if !isFocused && entry.text == "" {
-                            entry.text = promptText
-                        }
-                        focusHelper.adjustScroll()
-                    }
-                    .onChange(of: focusHelper.editingText) {
-                        isFocused = focusHelper.editingText
-                    }
-                .frame(height: focusHelper.editingDuration ? 1 : 200)
-            }
-            .onChange(of: entry.text, updateLastEdit)
-            .onChange(of: entry.duration, updateLastEdit)
-            .onChange(of: entry.colors, updateLastEdit)
-        }
-        
-        func updateLastEdit(old: Any, new: Any) {
-            entry.lastEdit = .now
-            Storage.main.startUpdateTimer(after: 1)
-        }
     }
     
     var durationEditor: some View {

@@ -92,11 +92,9 @@ class DateHelper: ObservableObject {
             }
         }
         
-        DispatchQueue.main.async {
-            self.times = tempTimes
-            self.hourStrings = tempHourStrings
-            self.currentTimeSlot = self.getCurrentTimeSlot()
-        }
+        self.times = tempTimes
+        self.hourStrings = tempHourStrings
+        self.currentTimeSlot = self.getCurrentTimeSlot()
         
         return tempTimes
     }

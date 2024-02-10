@@ -75,6 +75,8 @@ class Storage: ObservableObject {
     private func loadEntries(for day: String) {
         updateEntries(from: getEntries(for: day), for: day)
         
+        print("loading", entries.count, day)
+        
         if let time = FocusHelper.main.time {
             FocusHelper.main.changeTime(to: time, animate: true)
         }
@@ -82,6 +84,7 @@ class Storage: ObservableObject {
     
     private func updateEntries(from dict: [Int: Entry], for day: String) {
         var tempEntries = dict
+        
         
         let timeList = DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
         var nilQueue = 0
@@ -96,16 +99,16 @@ class Storage: ObservableObject {
             }
         }
         
-        DispatchQueue.main.async {
-            self.entriesDate = day
-            self.entries = tempEntries
-        }
+        
+        print("updating", dict.count, day, "entries", entries.count, entries.filter { !$0.value.isEmpty() }.count, "temp", tempEntries.count, tempEntries.filter { !$0.value.isEmpty() }.count)
+        
+        self.entriesDate = day
+        self.entries = tempEntries
     }
     
     func mergeEntries() {
-        guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
-        
         startUpdateTimer()
+        guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
         
         let day = entriesDate
         let onlineEntries = getEntries(for: day)
@@ -183,7 +186,11 @@ class Storage: ObservableObject {
     func startUpdateTimer(after wait: TimeInterval = 5) {
         updateTimer?.invalidate()
         updateTimer = Timer.scheduledTimer(withTimeInterval: wait, repeats: false, block: { _ in
-            self.mergeEntries()
+            print("timer", self.entriesDate, self.entries.count, self.entries.filter { !$0.value.isEmpty() }.count)
+            
+            DispatchQueue.main.async {
+                self.mergeEntries()
+            }
         })
     }
     
