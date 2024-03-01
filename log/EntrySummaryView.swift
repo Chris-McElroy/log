@@ -11,6 +11,7 @@ struct EntrySummaryView: View {
     @State var time: Int
     @State var colorsChanged: Bool = false
     
+    @Binding var updating: Bool
     @ObservedObject var entry: Entry
     @ObservedObject var storage: Storage = Storage.main
     @ObservedObject var dateHelper: DateHelper = DateHelper.main
@@ -27,10 +28,16 @@ struct EntrySummaryView: View {
                         .lineLimit(1)
                         .foregroundStyle(Color.white)
                         .padding(.horizontal, 6)
-                    Spacer().frame(height: colorsChanged ? 2 : 15)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                        //.frame(height: colorsChanged ? 2 : 15)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .onChange(of: entry.colors) { colorsChanged.toggle() }
+//                .onChange(of: focusHelper.time) {
+//                    if focusHelper.time == time { print("changing") }
+//                    self.currentEntry = storage.entries[focusHelper.time ?? 0] ?? Entry()
+//                }
+//                .onChange(of: currentEntry.colors) {
+//                    print("colors changed!")
+//                }
             }
         }
         .background {

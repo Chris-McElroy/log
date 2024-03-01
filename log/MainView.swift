@@ -19,6 +19,8 @@ struct MainView: View {
     @ObservedObject var storage = Storage.main
     @ObservedObject var dateHelper = DateHelper.main
     @ObservedObject var focusHelper = FocusHelper.main
+    @State var updating = false
+    @State var colors: [Int: Set<Int>] = [:]
     
     var body: some View {
         GeometryReader { _ in
@@ -50,6 +52,7 @@ struct MainView: View {
 #endif
         }
         .scrollContentBackground(.hidden)
+//        .onAppear(colors) // TODO have colors be linked to the thing to see if that solves this with less delay than the observed object shit. i think it might. and then i think there might be a way to pin everything here or something, idk.
 #if os(iOS)
         .gesture(DragGesture(minimumDistance: 20)
             .onEnded { drag in
@@ -129,7 +132,7 @@ struct MainView: View {
         VStack(spacing: 0) {
             ForEach(dateHelper.times, id: \.self) { time in
                 if let entry = storage.entries[time] {
-                    EntrySummaryView(time: time, entry: entry)
+                    EntrySummaryView(time: time, updating: $updating, entry: entry)
                         .frame(height: slotHeight*CGFloat(entry.duration))
                         .padding(.bottom, focusHelper.time == time && focusHelper.focus ? 150 : 0)
                 }
@@ -143,7 +146,7 @@ struct MainView: View {
                 ForEach(0..<4) { row in
                     GridRow {
                         ForEach(0..<4) { column in
-                            ColorButton(num: Categories.numFromPos[row][column], entry: entry)
+                            ColorButton(num: Categories.numFromPos[row][column], entry: entry, updating: $updating)
                                 .frame(height: 70)
                         }
                     }
@@ -158,14 +161,16 @@ struct MainView: View {
         let num: Int
         let name: String
         let color: Color
+        @Binding var updating: Bool
         @ObservedObject var entry: Entry
         @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
         
-        init(num: Int, entry: Entry) {
+        init(num: Int, entry: Entry, updating: Binding<Bool>) {
             self.num = num
             name =  Categories.names[num]
             color = Categories.colors[num]
             self.entry = entry
+            self._updating = updating
         }
         
         var body: some View {
@@ -193,6 +198,7 @@ struct MainView: View {
             } else {
                 entry.colors.insert(num)
             }
+            updating.toggle()
         }
     }
     

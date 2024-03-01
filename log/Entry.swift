@@ -11,6 +11,7 @@ class Entry: ObservableObject, Equatable, Hashable {
     @Published var text: String = ""
     @Published var colors: Set<Int> = []
     @Published var duration: Int = 1
+    @Published var colors2: Int = 0
     @Published var lastEdit: Date? = nil
     
     init(blank: Bool = false) {
@@ -42,6 +43,7 @@ class Entry: ObservableObject, Equatable, Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(text)
         hasher.combine(colors)
+        hasher.combine(colors2)
         hasher.combine(duration)
         hasher.combine(lastEdit)
     }
