@@ -33,7 +33,7 @@ class DateHelper: ObservableObject {
         return yearString + "." + String(date.month ?? 1) + "." + String(date.day ?? 1)
     }
     
-    private static func timeZoneOffset() -> Int {
+    static func timeZoneOffset() -> Int {
         Calendar.current.timeZone.secondsFromGMT()
     }
     
@@ -71,7 +71,7 @@ class DateHelper: ObservableObject {
         Storage.main.mergeEntries()
     }
     
-    func loadTimes(lo: Int?, hi: Int?) -> [Int] {
+    func getTimeSet(lo: Int?, hi: Int?) -> [Int] {
         let offset = DateHelper.timeZoneOffset()
         let lo = min(-offset, lo ?? -offset)
         let hi = max(110700-offset, hi ?? 110700-offset)
@@ -84,6 +84,12 @@ class DateHelper: ObservableObject {
             i += 900
         }
         
+        return tempTimes
+    }
+    
+    func loadTimes(lo: Int?, hi: Int?) -> [Int] {
+        let offset = DateHelper.timeZoneOffset()
+        let tempTimes = getTimeSet(lo: lo, hi: hi)
         var tempHourStrings: [Int: String] = [:]
         
         for time in tempTimes {
@@ -135,8 +141,8 @@ class DateHelper: ObservableObject {
         return startString + " - " + endString
     }
     
-    func getPertinentSlot() -> Int? {
-        let pertinentTime = Date.now.advanced(by: -300)
+    func getCurrentSlot(offset: Double = 0) -> Int? {
+        let pertinentTime = Date.now.advanced(by: offset)
         let todayRef = Calendar.current.dateComponents([.year, .month, .day], from: pertinentTime)
         
         let currentTimeToday = (Int(pertinentTime.timeIntervalSince(Calendar.current.startOfDay(for: pertinentTime))) - DateHelper.timeZoneOffset())/900*900

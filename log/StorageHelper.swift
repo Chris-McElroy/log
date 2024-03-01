@@ -97,6 +97,25 @@ class Storage: ObservableObject {
         }
     }
     
+    func returnAllEntries(for day: String) -> [Int: Entry] {
+        var tempEntries = getEntries(for: day)
+        
+        let timeList = DateHelper.main.getTimeSet(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
+        var nilQueue = 0
+        for time in timeList {
+            if nilQueue > 0 {
+                tempEntries[time] = nil
+                nilQueue -= 1
+            } else if let entry = tempEntries[time] {
+                nilQueue += entry.duration - 1
+            } else {
+                tempEntries[time] = Entry()
+            }
+        }
+        
+        return tempEntries
+    }
+    
     func mergeEntries() {
         startUpdateTimer()
         guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
@@ -139,8 +158,8 @@ class Storage: ObservableObject {
             }
         }
         
-        let oldTimeList = DateHelper.main.loadTimes(lo: entries.keys.min(), hi: entries.keys.max())
-        let newTimeList = DateHelper.main.loadTimes(lo: newEntries.keys.min(), hi: newEntries.keys.max())
+        let oldTimeList = DateHelper.main.getTimeSet(lo: entries.keys.min(), hi: entries.keys.max())
+        let newTimeList = DateHelper.main.getTimeSet(lo: newEntries.keys.min(), hi: newEntries.keys.max())
         let timeList = Array(Set(oldTimeList).union(newTimeList)).sorted()
         var nilQueue = 0
         
@@ -169,6 +188,8 @@ class Storage: ObservableObject {
             }
         }
         
+        _ = DateHelper.main.loadTimes(lo: entries.keys.min(), hi: entries.keys.max())
+        
         guard let dayFile = getDayFile(for: day) else { return }
         var data: [String: Any] = [:]
         for (time, entry) in entries where !entry.isNil() {
@@ -181,6 +202,8 @@ class Storage: ObservableObject {
         catch {
             print("couldn't write", day, error.localizedDescription)
         }
+        
+        AppTimer.updateTimes()
         
         struct EntryInfo: Hashable {
             let time: Int
