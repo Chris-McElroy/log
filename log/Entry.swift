@@ -9,9 +9,8 @@ import SwiftUI
 
 class Entry: ObservableObject, Equatable, Hashable {
     @Published var text: String = ""
-    @Published var colors: Set<Int> = []
+    @Published var colors: Int = 0
     @Published var duration: Int = 1
-    @Published var colors2: Int = 0
     @Published var lastEdit: Date? = nil
     
     init(blank: Bool = false) {
@@ -26,7 +25,9 @@ class Entry: ObservableObject, Equatable, Hashable {
         }
         text = entryData["t"] as? String ?? ""
         if let colors = entryData["c"] as? NSArray {
-            self.colors = Set(colors.compactMap { $0 as? Int })
+            for color in colors.compactMap({ $0 as? Int }) {
+                self.colors |= 1 << color
+            }
         }
         duration = entryData["d"] as? Int ?? 1
         if let timeIntervalSinceReferenceDate = entryData["e"] as? Double {
@@ -43,24 +44,29 @@ class Entry: ObservableObject, Equatable, Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(text)
         hasher.combine(colors)
-        hasher.combine(colors2)
         hasher.combine(duration)
         hasher.combine(lastEdit)
     }
     
     func isEmpty() -> Bool {
-        (text == "" || text == promptText) && colors.isEmpty && duration == 1
+        (text == "" || text == promptText) && colors == 0 && duration == 1
     }
     
     func isNil() -> Bool {
-        (text == "" || text == promptText) && colors.isEmpty && duration == 1 && lastEdit == nil
+        (text == "" || text == promptText) && colors == 0 && duration == 1 && lastEdit == nil
     }
     
     func toDict() -> NSDictionary {
         var tempDict: [String: Any] = [:]
         tempDict["t"] = text
-        if !colors.isEmpty {
-            tempDict["c"] = Array(colors)
+        if colors != 0 {
+            var tempArray: [Int] = []
+            for color in 0..<Categories.names.count {
+                if colors & (1 << color) != 0 { // TODO actually change to ints in the database as well
+                    tempArray.append(color)
+                }
+            }
+            tempDict["c"] = tempArray
         }
         if duration != 1 {
             tempDict["d"] = duration

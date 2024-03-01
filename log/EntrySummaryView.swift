@@ -16,6 +16,7 @@ struct EntrySummaryView: View {
     @ObservedObject var storage: Storage = Storage.main
     @ObservedObject var dateHelper: DateHelper = DateHelper.main
     @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
+    @State var colorInt: Int = 0
     
     var body: some View {
         ZStack {
@@ -31,6 +32,9 @@ struct EntrySummaryView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
                         //.frame(height: colorsChanged ? 2 : 15)
                 }
+                .onAppear {
+                    colorInt = entry.colors
+                }
 //                .onChange(of: focusHelper.time) {
 //                    if focusHelper.time == time { print("changing") }
 //                    self.currentEntry = storage.entries[focusHelper.time ?? 0] ?? Entry()
@@ -44,7 +48,10 @@ struct EntrySummaryView: View {
             HStack(spacing: 0) {
                 ForEach(0..<16) { i in
                     let color = Categories.displayOrder[i]
-                    if entry.colors.contains(color) {
+//                    if entry.colors.contains(color) {
+//                        Categories.colors[color]
+//                    }
+                    if colorInt & (1 << color) != 0 {
                         Categories.colors[color]
                     }
                 }
@@ -59,5 +66,11 @@ struct EntrySummaryView: View {
         .onChange(of: entry.text, entry.updateLastEdit)
         .onChange(of: entry.duration, entry.updateLastEdit)
         .onChange(of: entry.colors, entry.updateLastEdit)
+        .onChange(of: entry.colors) {
+            colorInt = entry.colors
+        }
+        .onChange(of: colorInt) {
+            entry.colors = colorInt
+        }
     }
 }

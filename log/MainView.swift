@@ -20,7 +20,7 @@ struct MainView: View {
     @ObservedObject var dateHelper = DateHelper.main
     @ObservedObject var focusHelper = FocusHelper.main
     @State var updating = false
-    @State var colors: [Int: Set<Int>] = [:]
+    @State var colors: [Int: Int] = [:]
     
     var body: some View {
         GeometryReader { _ in
@@ -29,7 +29,20 @@ struct MainView: View {
                     dayTitle
                     entriesList
                 }
-#if os(iOS)
+#if os(macOS)
+                .background(KeyPressHelper())
+                .onChange(of: focusHelper.editingText) {
+                    if !focusHelper.editingText {
+                        KeyPressHelper.reattach()
+                    }
+                }
+#endif
+#if os(macOS)
+                if focusHelper.editingText {
+                    switchEntryWithDButtons.opacity(0)
+                    focusButtons.opacity(0)
+                }
+#elseif os(iOS)
                 VStack(spacing: 0) {
                     Spacer()
                     colorButtons
@@ -37,14 +50,6 @@ struct MainView: View {
                 }
                 .offset(y: focusHelper.focus ? 0 : 400)
                 .animation(.easeInOut(duration: 0.3), value: focusHelper.focus)
-#elseif os(macOS)
-                if !focusHelper.editingText {
-                    colorButtons.opacity(0)
-                    dayButtons.opacity(0)
-                    switchEntryWithArrowButtons.opacity(0)
-                }
-                focusButtons.opacity(0)
-                switchEntryWithDButtons.opacity(0)
 #endif
             }
 #if os(iOS)
@@ -174,69 +179,22 @@ struct MainView: View {
         }
         
         var body: some View {
-#if os(iOS)
             ZStack {
                 Text(name)
                     .foregroundStyle(Color.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                if !entry.colors.contains(num) {
+                if entry.colors & (1 << num) == 0 {
                     color
                 }
             }
             .animation(nil, value: FocusHelper.main.time)
             .onTapGesture(perform: changeColor)
-#elseif os(macOS)
-            Button(name, action: changeColor)
-                .keyboardShortcut(Categories.keyFromNum[num], modifiers: [])
-#endif
         }
         
         func changeColor() {
             guard let time = focusHelper.time, let entry = Storage.main.entries[time] else { return }
-            if entry.colors.contains(num) {
-                entry.colors.remove(num)
-            } else {
-                entry.colors.insert(num)
-            }
+            entry.colors ^= 1 << num
             updating.toggle()
-        }
-    }
-    
-    var dayButtons: some View {
-        VStack(spacing: 0) {
-            Button("previous day") {
-                dateHelper.changeDay(forward: false)
-            }
-            .keyboardShortcut(.leftArrow, modifiers: [])
-            Button("next day") {
-                dateHelper.changeDay(forward: true)
-            }
-            .keyboardShortcut(.rightArrow, modifiers: [])
-        }
-    }
-    
-    var switchEntryWithArrowButtons: some View {
-        VStack(spacing: 0) {
-            Button("previous entry") {
-                if var time = focusHelper.time {
-                    repeat {
-                        time -= 900
-                        guard dateHelper.times.contains(time) else { return }
-                    } while storage.entries[time] == nil
-                    focusHelper.changeTime(to: time, animate: false)
-                }
-            }
-            .keyboardShortcut(.upArrow, modifiers: [])
-            Button("next entry") {
-                if var time = focusHelper.time {
-                    repeat {
-                        time += 900
-                        guard dateHelper.times.contains(time) else { return }
-                    } while storage.entries[time] == nil
-                    focusHelper.changeTime(to: time, animate: false)
-                }
-            }
-            .keyboardShortcut(.downArrow, modifiers: [])
         }
     }
     
@@ -266,37 +224,11 @@ struct MainView: View {
     }
     
     var focusButtons: some View {
-        VStack(spacing: 0) {
-            Button("focus") {
-                if focusHelper.editingText {
-                    return
-                } else if focusHelper.focus {
-                    focusHelper.editingText = true
-                } else if focusHelper.time != nil {
-                    withAnimation {
-                        focusHelper.focus = true
-                        focusHelper.adjustScroll()
-                    }
-                } else {
-                    focusHelper.changeTime(to: dateHelper.getPertinentSlot())
-                }
+        Button("unfocus") {
+            if focusHelper.editingText {
+                focusHelper.editingText = false
             }
-            .keyboardShortcut("e", modifiers: [.command])
-            Button("unfocus") {
-                if focusHelper.editingText {
-                    focusHelper.editingText = false
-                } else if focusHelper.focus {
-                    withAnimation {
-                        focusHelper.focus = false
-                        focusHelper.adjustScroll()
-                    }
-                } else {
-                    withAnimation {
-                        focusHelper.changeTime(to: nil)
-                    }
-                }
-            }
-            .keyboardShortcut("e", modifiers: [.command, .option])
         }
+        .keyboardShortcut("e", modifiers: [.command, .option])
     }
 }

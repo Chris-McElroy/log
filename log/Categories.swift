@@ -88,6 +88,8 @@ struct Categories {
         "c",     // 19
     ]
     
+    static let keyOrder: [Character] = ["r", "4", "1", "s", "q", "r", "r", "d", "x", "e", "w", "r", "r", "a", "f", "z", "2", "3", "v", "c"]
+    
 /* old colors:
     Color(hue: 276/360, saturation: 1, brightness: 0.85),       // hurting, blue-purple
     Color(hue: 300/360, saturation: 0.75, brightness: 1),       // arousing, pink

@@ -20,18 +20,19 @@ class Storage: ObservableObject {
     
     private var query: NSMetadataQuery? = nil
     @Published var entries: [Int: Entry] = [:]
-    private var data: [String: [String: Any]] = [:]
+//    private var data: [String: [String: Any]] = [:]
     private var entriesDate: String = ""
     private var updateTimer: Timer? = nil
     
-    private func pullData(for day: String) {
-        guard let dayFile = getDayFile(for: day) else { return }
+    private func pullData(for day: String) -> [String: Any] {
+        guard let dayFile = getDayFile(for: day) else { return [:] }
         
         do {
             let nsData = try NSDictionary(contentsOf: dayFile, error: {}())
-            data[day] = Dictionary(_immutableCocoaDictionary: nsData)
+            return Dictionary(_immutableCocoaDictionary: nsData)
         } catch {
             print("couldn't get contents")
+            return [:]
         }
     }
     
@@ -61,10 +62,10 @@ class Storage: ObservableObject {
     }
     
     private func getEntries(for day: String) -> [Int: Entry] {
-        pullData(for: day)
+        let data = pullData(for: day)
         
         var tempEntries: [Int: Entry] = [:]
-        for (time, entryData) in data[day] ?? [:] {
+        for (time, entryData) in data {
             guard let entryDict = entryData as? NSDictionary else { continue }
             tempEntries[Int(time.dropFirst()) ?? 0] = Entry(from: entryDict)
         }
@@ -73,16 +74,7 @@ class Storage: ObservableObject {
     }
     
     private func loadEntries(for day: String) {
-        updateEntries(from: getEntries(for: day), for: day)
-        
-        if let time = FocusHelper.main.time {
-            FocusHelper.main.changeTime(to: time, animate: true)
-        }
-    }
-    
-    private func updateEntries(from dict: [Int: Entry], for day: String) {
-        var tempEntries = dict
-        
+        var tempEntries = getEntries(for: day)
         
         let timeList = DateHelper.main.loadTimes(lo: tempEntries.keys.min(), hi: tempEntries.keys.max())
         var nilQueue = 0
@@ -99,11 +91,16 @@ class Storage: ObservableObject {
         
         self.entriesDate = day
         self.entries = tempEntries
+        
+        if let time = FocusHelper.main.time {
+            FocusHelper.main.changeTime(to: time, animate: true)
+        }
     }
     
     func mergeEntries() {
         startUpdateTimer()
         guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
+
         
         let day = entriesDate
         let onlineEntries = getEntries(for: day)
@@ -133,22 +130,53 @@ class Storage: ObservableObject {
         })
         
         var currentTimes: Set<Int> = []
-        data[day] = [:] // resetting so that nil entries are not kept
         var newEntries: [Int: Entry] = [:]
         
         for info in entryList {
             if currentTimes.isDisjoint(with: info.times) {
                 currentTimes.formUnion(info.times)
-                data[day]?["g\(info.time)"] = info.entry.toDict()
                 newEntries[info.time] = info.entry
             }
         }
         
-        updateEntries(from: newEntries, for: day)
+        let oldTimeList = DateHelper.main.loadTimes(lo: entries.keys.min(), hi: entries.keys.max())
+        let newTimeList = DateHelper.main.loadTimes(lo: newEntries.keys.min(), hi: newEntries.keys.max())
+        let timeList = Array(Set(oldTimeList).union(newTimeList)).sorted()
+        var nilQueue = 0
+        
+        for time in timeList {
+            if nilQueue > 0 {
+                entries[time] = nil
+                nilQueue -= 1
+            } else if let entry = newEntries[time] {
+                nilQueue += entry.duration - 1
+                if let oldEntry = entries[time] {
+                    oldEntry.text = entry.text
+                    oldEntry.colors = entry.colors
+                    oldEntry.duration = entry.duration
+                    oldEntry.lastEdit = entry.lastEdit
+                } else {
+                    entries[time] = entry
+                }
+            } else {
+                if let oldEntry = entries[time], !oldEntry.isEmpty() {
+                    oldEntry.text = ""
+                    oldEntry.colors = 0
+                    oldEntry.duration = 1
+                } else {
+                    entries[time] = Entry()
+                }
+            }
+        }
         
         guard let dayFile = getDayFile(for: day) else { return }
+        var data: [String: Any] = [:]
+        for (time, entry) in entries where !entry.isNil() {
+            data["g\(time)"] = entry.toDict()
+        }
+        
         do {
-            try NSDictionary(dictionary: data[day] ?? [:], copyItems: false).write(to: dayFile)
+            try NSDictionary(dictionary: data, copyItems: false).write(to: dayFile)
         }
         catch {
             print("couldn't write", day, error.localizedDescription)
