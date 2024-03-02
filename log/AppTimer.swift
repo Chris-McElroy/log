@@ -12,7 +12,6 @@ import AppKit
 
 class AppTimer {
     static func updateTimes() {
-        print("doin timers!")
         // determine the current day
         let midnight = Date.now.advanced(by: -18000) // sets 5 am to midnight
         let todayRef = Calendar.current.dateComponents([.year, .month, .day], from: midnight)
@@ -20,7 +19,6 @@ class AppTimer {
         
         // determine the current time in the current day
         var time = (Int(Date.now.timeIntervalSince(Calendar.current.startOfDay(for: midnight))) - DateHelper.timeZoneOffset())/900*900
-        print("initial time", time)
         
         // load all the entries for that day
         let entries = Storage.main.returnAllEntries(for: today)
@@ -32,7 +30,6 @@ class AppTimer {
         
         // if there is none, return
         guard entries[time] != nil else { return }
-        print("got entry!", today, entries.count, time)
         
         // otherwise, for each app, see how long it's viable, and add that to a dictionary
         var appTimers: [String: String] = [:]
@@ -42,7 +39,6 @@ class AppTimer {
         for (app, validCategories) in appColors {
             var localTime = time
             while (entries[localTime]?.colors ?? 0) & validCategories != 0 {
-                print("looping", entries[localTime]?.colors, validCategories, (entries[localTime]?.colors ?? 0) & validCategories)
                 localTime += 900
                 while entries[localTime] == nil && localTime < entries.keys.max() ?? 0 {
                     localTime += 900
@@ -52,11 +48,17 @@ class AppTimer {
             appTimers[app] = formatter.string(from: stopTime)
         }
         
-        print("got dict")
-        print(appTimers)
-        
         // write that dictionary
         guard let appTimerFile = getAppTimerFile() else { return }
+        
+        do {
+            let nsData = try NSDictionary(contentsOf: appTimerFile, error: {}())
+            let oldData: [String: String] = Dictionary(_immutableCocoaDictionary: nsData)
+            if oldData == appTimers { return }
+        } catch {
+            print("couldn't get contents")
+            return
+        }
         
         do {
             try NSDictionary(dictionary: appTimers, copyItems: false).write(to: appTimerFile)
@@ -67,7 +69,37 @@ class AppTimer {
     }
     
     static let appColors: [String: Int]  = [
-        "Orion": 1 << 17
+        // consuming
+        "Orion": 1 << 17 | 1 << 8, // also playing
+        "Books": 1 << 17 | 1 << 7, // also working
+        
+        // interacting
+        "Beeper": 1 << 9,
+        "Mail": 1 << 9,
+        "Messages": 1 << 9,
+        "Signal": 1 << 9,
+        "Messenger": 1 << 9,
+        "WhatsApp": 1 << 9,
+        "Snapchat": 1 << 9,
+        
+        // playing
+        "Xcode": 1 << 8,
+        "Visual Studio Code": 1 << 8 | 1 << 7, // also working
+        "Tinkertool": 1 << 8,
+        "Warp": 1 << 8,
+        "Alfred Preferences": 1 << 8,
+        "System Settings": 1 << 8,
+        "Shortcuts": 1 << 8,
+        "Minecraft": 1 << 8,
+        "App Store": 1 << 8,
+        "Chess": 1 << 8,
+        
+        // working
+        "PDF Viewer": 1 << 7,
+        "RStudio": 1 << 7,
+        "Microsoft Word": 1 << 7,
+        "Microsoft Excel": 1 << 7,
+        "Microsoft PowerPoint": 1 << 7,
     ]
     
     private static func getAppTimerFile() -> URL? {
