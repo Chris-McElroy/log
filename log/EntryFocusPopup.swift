@@ -32,12 +32,12 @@ struct EntryFocusView: View {
             .onChange(of: focusHelper.editingText) {
                 isFocused = focusHelper.editingText
             }
-            .onChange(of: entry.text) {
+//            .onChange(of: entry.text) {
                 // hoping this helps with the sometimes-deleting bug, not sure if it's necessary
-                if let time = FocusHelper.main.time {
-                    Storage.main.entries[time]?.text = entry.text
-                }
-            }
+//                if let time = FocusHelper.main.time {
+//                    Storage.main.entries[time]?.text = entry.text
+//                }
+//            }
     }
 }
 

@@ -33,6 +33,8 @@ class FocusHelper: ObservableObject {
         }
         
         if var new = time {
+            // consider adding self.time = nil to see if that helps with the duplication bug
+            
             while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
                 new -= 900
             }
