@@ -15,15 +15,15 @@ class FocusHelper: ObservableObject {
     @Published var editingDuration: Bool = false
     @Published var scrollProxy: ScrollViewProxy? = nil
     @Published var time: Int? = nil
+    @Published var changing: Bool = false
     @Published var focus: Bool = false
     @Published var newTime: Int? = nil
     
     func changeTime(to time: Int?, animate: Bool = true) {
-        if time == self.time {
-            withAnimation(animate ? .default : nil) {
-                focus = false
-                adjustScroll()
-            }
+        changing = true
+        withAnimation(animate ? .default : nil) {
+            focus = false
+            adjustScroll()
         }
         newTime = time
         editingText = false // otherwise text editor edits the old text
@@ -32,18 +32,22 @@ class FocusHelper: ObservableObject {
             Storage.main.entries[old]?.text = ""
         }
         if var new = time {
-            self.time = nil // hoping this will help with the duplication bug
+//            self.time = nil // hoping this will help with the duplication bug
             
-                while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
+            while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
                 new -= 900
             }
             
-            withAnimation(animate ? .default : nil) {
-                self.time = new
-            }
-            adjustScroll(animate: animate)
+//            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
+                withAnimation(animate ? .default : nil) {
+                    self.time = new
+                }
+                self.adjustScroll(animate: animate)
+                self.changing = false
+//            }
         } else {
-            self.time = time
+            self.time = nil
+            changing = false
         }
     }
     

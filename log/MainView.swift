@@ -80,7 +80,7 @@ struct MainView: View {
                     if let time = focusHelper.time, focusHelper.focus, let entry = storage.entries[time] {
                         VStack(spacing: 0) {
                             Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
-                            EntryFocusView(entry: entry)
+                            EntryFocusView(time: time, entry: entry)
                             Spacer()
                         }
                     }
@@ -118,6 +118,7 @@ struct MainView: View {
                                     LinearGradient(colors: [.black], startPoint: .leading, endPoint: .trailing)
                                 }
                             }
+                            .animation(.none, value: focusHelper.time)
                         Color.white.frame(width: 1)
                     }
                 }

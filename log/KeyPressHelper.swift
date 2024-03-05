@@ -87,7 +87,7 @@ struct KeyPressHelper: NSViewRepresentable {
                     time += 900
                     guard dateHelper.times.contains(time) else { return }
                 } while storage.entries[time] == nil
-                focusHelper.changeTime(to: time, animate: false)
+                focusHelper.changeTime(to: time, animate: true)
             }
         }
         
@@ -97,7 +97,7 @@ struct KeyPressHelper: NSViewRepresentable {
                     time -= 900
                     guard dateHelper.times.contains(time) else { return }
                 } while storage.entries[time] == nil
-                focusHelper.changeTime(to: time, animate: false)
+                focusHelper.changeTime(to: time, animate: true)
             }
         }
     }
