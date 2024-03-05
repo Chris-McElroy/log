@@ -31,11 +31,10 @@ class FocusHelper: ObservableObject {
         if let old = self.time, Storage.main.entries[old]?.text == promptText {
             Storage.main.entries[old]?.text = ""
         }
-        
         if var new = time {
-            // consider adding self.time = nil to see if that helps with the duplication bug
+            self.time = nil // hoping this will help with the duplication bug
             
-            while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
+                while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
                 new -= 900
             }
             
