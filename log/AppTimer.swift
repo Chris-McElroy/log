@@ -71,7 +71,7 @@ class AppTimer {
     static let appColors: [String: Int]  = [
         // consuming
         "Consuming": 1 << 17,
-        "Orion": 1 << 17 | 1 << 8, // also playing
+        "Orion": 1 << 17 | 1 << 8 | 1 << 7, // also playing and working
         "Books": 1 << 17 | 1 << 7, // also working
         
         // interacting
@@ -86,6 +86,7 @@ class AppTimer {
         // playing
         "Xcode": 1 << 8,
         "Visual Studio Code": 1 << 8 | 1 << 7, // also working
+        "Fello AI": 1 << 8 | 1 << 7, // also working
         "Tinkertool": 1 << 8,
         "Warp": 1 << 8,
         "Alfred Preferences": 1 << 8,
@@ -102,6 +103,10 @@ class AppTimer {
         "Microsoft Excel": 1 << 7,
         "Microsoft PowerPoint": 1 << 7,
         "Working": 1 << 7,
+        
+        // thinking (or playing or working or tending)
+        "TickTick": 1 << 13 | 1 << 14 | 1 << 8 | 1 << 7,
+        "Obsidian": 1 << 13 | 1 << 14 | 1 << 8 | 1 << 7,
     ]
     
     private static func getAppTimerFile() -> URL? {
