@@ -76,7 +76,7 @@ class AppTimer {
         
         // interacting
         "Beeper": 1 << 9,
-        "Mail": 1 << 9,
+        "Mail": 1 << 9 | 1 << 7 | 1 << 13, // also working and tending
         "Messages": 1 << 9,
         "Signal": 1 << 9,
         "Messenger": 1 << 9,
@@ -88,7 +88,7 @@ class AppTimer {
         "Visual Studio Code": 1 << 8 | 1 << 7, // also working
         "Fello AI": 1 << 8 | 1 << 7, // also working
         "Tinkertool": 1 << 8,
-        "Warp": 1 << 8,
+        "Warp": 1 << 8 | 1 << 7, // also working
         "Alfred Preferences": 1 << 8,
         "System Settings": 1 << 8,
         "Shortcuts": 1 << 8,
@@ -104,9 +104,12 @@ class AppTimer {
         "Microsoft PowerPoint": 1 << 7,
         "Working": 1 << 7,
         
-        // thinking (or playing or working or tending)
-        "TickTick": 1 << 13 | 1 << 14 | 1 << 8 | 1 << 7,
-        "Obsidian": 1 << 13 | 1 << 14 | 1 << 8 | 1 << 7,
+        // listening
+        "Spotify": 1 << 16,
+        
+        // anything
+        "TickTick": Int.max,
+        "Obsidian": Int.max,
     ]
     
     private static func getAppTimerFile() -> URL? {

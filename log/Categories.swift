@@ -65,30 +65,29 @@ struct Categories {
         Color(hue: 1/360, saturation: 0.9, brightness: 1),           // enjoying, deep red
     ]
     
-    static let keyFromNum: [KeyEquivalent] = [
-        "r",     // 0
-        "4",     // 1
-        "1",     // 2
-        "s",      // 3
-        "q",   // 4
-        "k",     // 5
-        "k",      // 6
-        "d",      // 7
-        "x",      // 8
-        "e",  // 9
-        "w",    // 10
-        "k",// 11
-        "k",  // 12
-        "a",      // 13
-        "f",     // 14
-        "z",     // 15
-        "2",    // 16
-        "3",    // 17
-        "v",      // 18
-        "c",     // 19
+    static let keyOrder: [Character] =
+    [
+        "2",    // 0  - hurting
+        "v",    // 1  - arousing
+        "r",    // 2  - relaxing
+        "d",    // 3  - eating
+        "x",    // 4  - exercising
+        "k",    // 5  - shopping
+        "k",    // 6  - meeting
+        "f",    // 7  - working
+        "c",    // 8  - playing
+        "a",    // 9  - interacting
+        "w",    // 10 - traveling
+        "k",    // 11 - commuinicating
+        "k",    // 12 - configuring
+        "s",    // 13 - tending
+        "e",    // 14 - thinking
+        "q",    // 15 - sleeping
+        "3",    // 16 - listening
+        "4",    // 17 - consuming
+        "1",    // 18 - failing
+        "z",    // 19 - enjoying
     ]
-    
-    static let keyOrder: [Character] = ["r", "4", "1", "s", "q", "r", "r", "d", "x", "e", "w", "r", "r", "a", "f", "z", "2", "3", "v", "c"]
     
 /* old colors:
     Color(hue: 276/360, saturation: 1, brightness: 0.85),       // hurting, blue-purple
