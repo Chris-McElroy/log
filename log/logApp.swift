@@ -31,7 +31,7 @@ struct logApp: App {
                         DateHelper.main.updateDay()
                     }
                     if (lastActive?.timeIntervalSinceNow ?? -100000) > -300 { return }
-                    if let currentTime = DateHelper.main.getCurrentSlot(offset: -300) {
+                    if let currentTime = DateHelper.main.getCurrentSlot(offset: 0) {
                         FocusHelper.main.changeTime(to: currentTime, animate: false)
                         FocusHelper.main.focus = true
                         FocusHelper.main.adjustScroll(animate: false)

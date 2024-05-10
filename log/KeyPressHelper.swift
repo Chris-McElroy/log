@@ -62,7 +62,7 @@ struct KeyPressHelper: NSViewRepresentable {
                     focusHelper.adjustScroll()
                 }
             } else {
-                focusHelper.changeTime(to: dateHelper.getCurrentSlot(offset: -300))
+                focusHelper.changeTime(to: dateHelper.getCurrentSlot(offset: 0))
             }
         }
         
