@@ -75,7 +75,7 @@ struct Categories {
         "k",    // 5  - shopping
         "k",    // 6  - meeting
         "f",    // 7  - working
-        "c",    // 8  - playing
+        "z",    // 8  - playing
         "a",    // 9  - interacting
         "w",    // 10 - traveling
         "k",    // 11 - commuinicating
@@ -86,7 +86,7 @@ struct Categories {
         "3",    // 16 - listening
         "4",    // 17 - consuming
         "1",    // 18 - failing
-        "z",    // 19 - enjoying
+        "c",    // 19 - enjoying
     ]
     
 /* old colors:
