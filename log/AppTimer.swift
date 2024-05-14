@@ -81,6 +81,7 @@ class AppTimer {
         "Signal": 1 << 9,
         "Messenger": 1 << 9,
         "WhatsApp": 1 << 9,
+        "Snapchat": 1 << 9 | 1 << 13, // also tending
         "Interacting": 1 << 9,
         
         // playing
