@@ -21,6 +21,7 @@ struct MainView: View {
     @ObservedObject var focusHelper = FocusHelper.main
     @State var updating = false
     @State var colors: [Int: Int] = [:]
+    @State var testtext = "hi i'm some text!" // TODO remove
     
     var body: some View {
         GeometryReader { _ in
@@ -77,13 +78,15 @@ struct MainView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 ZStack {
-                    if let time = focusHelper.time, focusHelper.focus, let entry = storage.entries[time] {
-                        VStack(spacing: 0) {
+                    VStack(spacing: 0) {
+                        if let time = focusHelper.time, focusHelper.focus, let entry = storage.entries[time] {
                             Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
-                            EntryFocusView(time: time, entry: entry)
-                            Spacer()
                         }
+                        EntryFocusView()
+                        Spacer()
                     }
+                    .animation(.none, value: focusHelper.focus)
+                    .animation(.none, value: focusHelper.time)
                     HStack(spacing: 0) {
                         timeList
                         summaryList

@@ -10,53 +10,70 @@ import SwiftUI
 let promptText = "tap to edit"
 
 struct EntryFocusView: View {
-    let time: Int
-    @State var text: String
-    @ObservedObject var entry: Entry
+    @State var text = ""
+    @State var textEditTime: Int = Int.max
+    @State var textEditDay: String = ""
+    @ObservedObject var entry: Entry = Storage.main.currentEntry
     @ObservedObject var focusHelper: FocusHelper = FocusHelper.main
+    @ObservedObject var dateHelper: DateHelper = DateHelper.main
+    @ObservedObject var storage: Storage = Storage.main
     @FocusState var isFocused: Bool
-    
-    init(time: Int, entry: Entry) {
-        self.time = time
-        self.entry = entry
-        self.text = entry.text
-    }
     
     var body: some View {
         TextEditor(text: $text)
             .multilineTextAlignment(.leading)
             .focused($isFocused)
             .padding(.all, 8)
-            .frame(height:  150)
+            .frame(height: 150)
+            .opacity(focusHelper.focus ? 1 : 0) // helps it dissapear well when animating
+        
+        // changing focus
             .onChange(of: isFocused) {
                 focusHelper.editingText = isFocused
                 focusHelper.editingColors = false
-                
-                if isFocused && entry.text == promptText {
-                    entry.text = "" // TODO weed out prompttext in loading
-                }
                 focusHelper.adjustScroll()
             }
-//            .onAppear {
-//                print("appearing", time)
-//            }
             .onChange(of: focusHelper.editingText) {
                 isFocused = focusHelper.editingText
             }
-            .onChange(of: text) {
-                if time == FocusHelper.main.time && !focusHelper.changing {
-                    entry.text = text
-                } else {
-                    print("problem!", time)
-                }
-            }
-            .onChange(of: entry.text) {
-                if time == FocusHelper.main.time && !focusHelper.changing {
+        
+        // switching entries
+            .onChange(of: focusHelper.time, {
+                if let time = focusHelper.time, let entry = storage.entries[time] {
                     text = entry.text
+                    storage.currentEntry = entry
+                    textEditTime = time
+                    textEditDay = dateHelper.day
                 } else {
-                    print("problem!", time)
+                    text = ""
+                    storage.currentEntry = Entry()
+                    textEditTime = Int.max
+                    textEditDay = ""
                 }
-            }
+            })
+        
+        // editing text
+            .onChange(of: text, {
+                if let time = focusHelper.time, let entry = storage.entries[time], !focusHelper.changing {
+                    if textEditTime == time && textEditDay == dateHelper.day {
+                        entry.text = text
+                    } else {
+                        text = entry.text
+                        storage.currentEntry = entry
+                        textEditTime = time
+                        textEditDay = dateHelper.day
+                    }
+                } else if !focusHelper.changing {
+                    text = ""
+                }
+            })
+            .onChange(of: entry.text, {
+                if let time = focusHelper.time, let entry = storage.entries[time], !focusHelper.changing {
+                    text = entry.text
+                } else if !focusHelper.changing {
+                    text = ""
+                }
+            })
     }
 }
 

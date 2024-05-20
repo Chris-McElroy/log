@@ -18,8 +18,11 @@ https://developer.apple.com/documentation/uikit/documents_data_and_pasteboard/sy
 class Storage: ObservableObject {
     static let main = Storage()
     
-    private var query: NSMetadataQuery? = nil
+    
     @Published var entries: [Int: Entry] = [:]
+    @Published var currentEntry: Entry = Entry()
+    
+    private var query: NSMetadataQuery? = nil
 //    private var data: [String: [String: Any]] = [:]
     private var entriesDate: String = ""
     private var updateTimer: Timer? = nil
