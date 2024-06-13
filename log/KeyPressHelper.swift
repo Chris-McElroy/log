@@ -32,6 +32,8 @@ struct KeyPressHelper: NSViewRepresentable {
                     nextEntry()
                 } else if event.characters == "∂" {
                     prevEntry()
+                } else if event.characters == "s" {
+                    toggleStats()
                 }
             } else {
                 if !focusHelper.editingText {
@@ -98,6 +100,12 @@ struct KeyPressHelper: NSViewRepresentable {
                     guard dateHelper.times.contains(time) else { return }
                 } while storage.entries[time] == nil
                 focusHelper.changeTime(to: time, animate: true)
+            }
+        }
+        
+        func toggleStats() {
+            withAnimation {
+                focusHelper.stats.toggle()
             }
         }
     }

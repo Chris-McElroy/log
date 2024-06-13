@@ -18,6 +18,7 @@ class FocusHelper: ObservableObject {
     @Published var changing: Bool = false
     @Published var focus: Bool = false
     @Published var newTime: Int? = nil
+    @Published var stats: Bool = false
     
     func changeTime(to time: Int?, animate: Bool = true) {
         changing = true

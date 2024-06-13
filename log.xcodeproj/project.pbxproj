@@ -22,6 +22,7 @@
 		1E8914002B479B0B005F1EC2 /* Categories.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8913FF2B479B0B005F1EC2 /* Categories.swift */; };
 		1EA2A9142B92527F000D2929 /* AppTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EA2A9132B92527F000D2929 /* AppTimer.swift */; };
 		1EC4A8FD2B1AA8D7003C26A5 /* StorageHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */; };
+		1EE588C62C1AFCA300B9AE41 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EE588C52C1AFCA300B9AE41 /* StatsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		1EA2A9132B92527F000D2929 /* AppTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTimer.swift; sourceTree = "<group>"; };
 		1EBCAC962B1A9FEA0034CDD5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1EC4A8FC2B1AA8D7003C26A5 /* StorageHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageHelper.swift; sourceTree = "<group>"; };
+		1EE588C52C1AFCA300B9AE41 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		1EFDB2F62B4209300011A0FF /* AnimationHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationHelper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -79,6 +81,7 @@
 				1E8401C22AC3427A0034B181 /* logApp.swift */,
 				1E8401C42AC3427A0034B181 /* MainView.swift */,
 				1E12FA702B3F0D8D002040FD /* EntrySummaryView.swift */,
+				1EE588C52C1AFCA300B9AE41 /* StatsView.swift */,
 				1E72DB962B7719FB00119154 /* DurationEditorView.swift */,
 				1E12FA742B3F1315002040FD /* EntryFocusPopup.swift */,
 				1E78457C2B3CCADE0049D31E /* Entry.swift */,
@@ -190,6 +193,7 @@
 				1E8401C32AC3427A0034B181 /* logApp.swift in Sources */,
 				1E6868EC2B917100000284F1 /* KeyPressHelper.swift in Sources */,
 				1EC4A8FD2B1AA8D7003C26A5 /* StorageHelper.swift in Sources */,
+				1EE588C62C1AFCA300B9AE41 /* StatsView.swift in Sources */,
 				1E72DB972B7719FB00119154 /* DurationEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

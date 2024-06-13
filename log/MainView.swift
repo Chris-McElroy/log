@@ -27,8 +27,12 @@ struct MainView: View {
         GeometryReader { _ in
             ZStack {
                 VStack {
+                    StatsView()
+                        .frame(height: focusHelper.stats ? nil : 0)
+                        .opacity(focusHelper.stats ? 1 : 0)
                     dayTitle
                     entriesList
+                        .frame(height: focusHelper.stats ? 0 : nil)
                 }
 #if os(macOS)
                 .background(KeyPressHelper())
@@ -69,7 +73,7 @@ struct MainView: View {
     }
     
     var dayTitle: some View {
-        Text(dateHelper.day)
+        Text(dateHelper.dayTitle)
             .font(Font.custom("Baskerville", size: 20.0))
             .padding(.vertical, 5)
     }
