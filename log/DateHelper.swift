@@ -158,7 +158,7 @@ class DateHelper: ObservableObject {
         let pertinentTime = Date.now.advanced(by: offset)
         let todayRef = Calendar.current.dateComponents([.year, .month, .day, .weekday], from: pertinentTime)
         
-        let currentTimeToday = (Int(pertinentTime.timeIntervalSince(Calendar.current.startOfDay(for: pertinentTime))) - DateHelper.timeZoneOffset())/900*900
+        let currentTimeToday = (Int(pertinentTime.timeIntervalSince(Calendar.current.startOfDay(for: pertinentTime))) - DateHelper.timeZoneOffset() + 86400)/900*900 - 86400 // plus minus because swift is a god damn piece of shit and can't round negative numbers the right way so help it god
         print(currentTimeToday)
         
         if dateRef == todayRef {
@@ -174,6 +174,7 @@ class DateHelper: ObservableObject {
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: pertinentTime) ?? pertinentTime
         let yesterdayRef = Calendar.current.dateComponents([.year, .month, .day, .weekday], from: yesterday)
         if dateRef == yesterdayRef && times.contains(currentTimeToday + 86400) {
+            print("yesterday", currentTimeToday, currentTimeToday + 86400)
             return currentTimeToday + 86400 // TODO this is off by 15 min somehow
         }
         
