@@ -24,13 +24,14 @@ struct MainView: View {
     @State var testtext = "hi i'm some text!" // TODO remove
     
     var body: some View {
-        GeometryReader { _ in
+        GeometryReader { gr in
             ZStack {
                 VStack {
                     StatsView()
                         .frame(height: focusHelper.stats ? nil : 0)
                         .opacity(focusHelper.stats ? 1 : 0)
                     dayTitle
+                    Spacer().frame(height: focusHelper.stats ? 100 : 0)
                     entriesList
                         .frame(height: focusHelper.stats ? 0 : nil)
                 }
@@ -76,6 +77,17 @@ struct MainView: View {
         Text(dateHelper.dayTitle)
             .font(Font.custom("Baskerville", size: 20.0))
             .padding(.vertical, 5)
+            .gesture(DragGesture(minimumDistance: 20)
+                .onEnded { drag in
+                    guard focusHelper.time == nil else { return }
+                    if abs(drag.translation.height) > abs(drag.translation.width) {
+                        if (drag.translation.height < 0) == focusHelper.stats {
+                            withAnimation(.linear) {
+                                focusHelper.stats.toggle()
+                            }
+                        }
+                    }
+                })
     }
     
     var entriesList: some View {

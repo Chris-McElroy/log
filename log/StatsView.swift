@@ -12,21 +12,23 @@ struct StatsView: View {
     @State var timeList: [Int: (Double, Double)] = [:]
     
     var body: some View {
-        VStack(spacing: 20) {
-            if let overallTimes = timeList[-1], overallTimes.0 != 0 {
-                Spacer().frame(height: 30)
-                timeLine(i: nil, times: overallTimes)
-                Rectangle()
-                    .foregroundStyle(.white)
-                    .frame(width: 300, height: 2)
-                ForEach(0..<16) { i in
-                    if let times = timeList[i] {
-                        timeLine(i: i, times: times)
+        ScrollView {
+            VStack(spacing: 20) {
+                if let overallTimes = timeList[-1], overallTimes.0 != 0 {
+                    Spacer().frame(height: 30)
+                    timeLine(i: nil, times: overallTimes)
+                    Rectangle()
+                        .foregroundStyle(.white)
+                        .frame(width: 300, height: 2)
+                    ForEach(0..<16) { i in
+                        if let times = timeList[i] {
+                            timeLine(i: i, times: times)
+                        }
                     }
+                    Spacer()
+                } else {
+                    Spacer()
                 }
-                Spacer()
-            } else {
-                Spacer()
             }
         }
         .onChange(of: storage.entries, {

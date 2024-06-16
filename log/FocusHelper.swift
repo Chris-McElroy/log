@@ -12,7 +12,7 @@ class FocusHelper: ObservableObject {
     
     @Published var editingText: Bool = false
     @Published var editingColors: Bool = false
-    @Published var editingDuration: Bool = false
+//    @Published var editingDuration: Bool = false
     @Published var scrollProxy: ScrollViewProxy? = nil
     @Published var time: Int? = nil
     @Published var changing: Bool = false
