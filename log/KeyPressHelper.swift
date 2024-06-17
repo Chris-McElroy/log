@@ -54,28 +54,20 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func focusIn() {
+            guard !focusHelper.stats else { return }
             if focusHelper.editingText {
                 return
             } else if focusHelper.focus {
                 focusHelper.editingText = true
-            } else if focusHelper.time != nil {
-                withAnimation {
-                    focusHelper.focus = true
-                    focusHelper.adjustScroll()
-                }
             } else {
                 focusHelper.changeTime(to: dateHelper.getCurrentSlot(offset: 0))
             }
         }
         
         func focusOut() {
+            guard !focusHelper.stats else { return }
             if focusHelper.editingText {
                 focusHelper.editingText = false
-            } else if focusHelper.focus {
-                withAnimation {
-                    focusHelper.focus = false
-                    focusHelper.adjustScroll()
-                }
             } else {
                 withAnimation {
                     focusHelper.changeTime(to: nil)
@@ -84,6 +76,7 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func nextEntry() {
+            guard !focusHelper.stats else { return }
             if var time = focusHelper.time {
                 repeat {
                     time += 900
@@ -94,6 +87,7 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func prevEntry() {
+            guard !focusHelper.stats else { return }
             if var time = focusHelper.time {
                 repeat {
                     time -= 900
@@ -104,6 +98,7 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func toggleStats() {
+            guard focusHelper.time == nil else { return }
             withAnimation {
                 focusHelper.stats.toggle()
             }

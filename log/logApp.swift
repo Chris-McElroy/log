@@ -33,8 +33,8 @@ struct logApp: App {
                     if (lastActive?.timeIntervalSinceNow ?? -100000) > -300 { return }
                     if let currentTime = DateHelper.main.getCurrentSlot(offset: 0) {
                         FocusHelper.main.changeTime(to: currentTime, animate: false)
-                        FocusHelper.main.focus = true
-                        FocusHelper.main.adjustScroll(animate: false)
+//                        FocusHelper.main.focus = true
+//                        FocusHelper.main.adjustScroll(animate: false)
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: resignNotification)) { _ in

@@ -19,17 +19,19 @@ struct DurationEditorView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if focusHelper.time != nil && !focusHelper.editingText {
+            if focusHelper.time != nil {
 //                Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*slotHeight)
                 HStack(spacing: 0) {
                     Spacer().frame(width: 40)
                     VStack(spacing: 0) { // select/edit duration if entry is tapped/draged
                         Color.black.opacity(0.0001)
                             .gesture(changeEntryStartGesture)
+                            .gesture(tappedTopArea)
                             .frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
                         Spacer().frame(height: 150)
                         Color.black.opacity(0.0001)
                             .gesture(changeEntryDurationGesture)
+                            .gesture(tappedBottomArea)
                     }
 //                    .onTapGesture(count: 1) {
 //                        withAnimation {
@@ -54,6 +56,34 @@ struct DurationEditorView: View {
 //            }
         }
         .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
+    }
+    
+    var tappedTopArea: some Gesture {
+        SpatialTapGesture(count: 1)
+            .onEnded { value in
+                var timePoint = (Int(value.location.y/slotHeight))*900 + (dateHelper.times.first ?? 0)
+                while storage.entries[timePoint] == nil {
+                    timePoint -= 900
+                    if timePoint < (dateHelper.times.first ?? -1000000) {
+                        return // if we somehow missed it, return
+                    }
+                }
+                focusHelper.changeTime(to: timePoint, animate: true)
+            }
+    }
+    
+    var tappedBottomArea: some Gesture {
+        SpatialTapGesture(count: 1)
+            .onEnded { value in
+                var timePoint = (Int(value.location.y/slotHeight) + 1)*900 + time
+                while storage.entries[timePoint] == nil {
+                    timePoint -= 900
+                    if timePoint <= time {
+                        return // if we somehow missed it, return
+                    }
+                }
+                focusHelper.changeTime(to: timePoint, animate: true)
+            }
     }
     
     var changeEntryStartGesture: some Gesture {
