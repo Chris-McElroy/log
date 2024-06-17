@@ -22,17 +22,24 @@ class FocusHelper: ObservableObject {
     
     func changeTime(to time: Int?, animate: Bool = true) {
         changing = true
-        withAnimation(animate ? .default : nil) {
-            focus = false
-            adjustScroll()
+        if time == nil {
+            withAnimation(animate ? .default : nil) {
+                focus = false
+                adjustScroll()
+            }
+            editingText = false
         }
         newTime = time
-        editingText = false // otherwise text editor edits the old text
         
         if let old = self.time, Storage.main.entries[old]?.text == promptText {
             Storage.main.entries[old]?.text = ""
         }
         if var new = time {
+            if new == self.time {
+                editingText.toggle()
+                return
+            }
+            
 //            self.time = nil // hoping this will help with the duplication bug
             
             while Storage.main.entries[new] == nil && new > DateHelper.main.times[0] {
@@ -42,6 +49,8 @@ class FocusHelper: ObservableObject {
 //            Timer.scheduledTimer(withTimeInterval: 1, repeats: false) { _ in
                 withAnimation(animate ? .default : nil) {
                     self.time = new
+                    focus = true
+                    editingText = true
                 }
                 self.adjustScroll(animate: animate)
                 self.changing = false

@@ -19,36 +19,39 @@ struct DurationEditorView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if focusHelper.time != nil && !focusHelper.focus {
-                Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*slotHeight)
+            if focusHelper.time != nil && !focusHelper.editingText {
+//                Spacer().frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900)*slotHeight)
                 HStack(spacing: 0) {
                     Spacer().frame(width: 40)
                     VStack(spacing: 0) { // select/edit duration if entry is tapped/draged
                         Color.black.opacity(0.0001)
                             .gesture(changeEntryStartGesture)
+                            .frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
+                        Spacer().frame(height: 150)
                         Color.black.opacity(0.0001)
                             .gesture(changeEntryDurationGesture)
                     }
-                    .onTapGesture(count: 1) {
-                        withAnimation {
-                            focusHelper.focus.toggle()
-                            focusHelper.adjustScroll()
-                        }
-                    }
+//                    .onTapGesture(count: 1) {
+//                        withAnimation {
+//                            focusHelper.focus.toggle()
+//                            focusHelper.adjustScroll()
+//                        }
+//                    }
                 }
-                .frame(height: CGFloat(entry.duration)*slotHeight)
-                Spacer()
-            } else if focusHelper.time != nil && focusHelper.editingText {
-                VStack(spacing: 0) {
-                    Color.black.opacity(0.0001)
-                        .frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
-                    Spacer().frame(height: 150)
-                    Color.black.opacity(0.0001)
-                }
-                .onTapGesture {
-                    focusHelper.editingText = false
-                }
+//                .frame(height: CGFloat(entry.duration)*slotHeight)
+//                Spacer()
             }
+//            else if focusHelper.time != nil && focusHelper.editingText {
+//                VStack(spacing: 0) {
+//                    Color.black.opacity(0.0001)
+//                        .frame(height: CGFloat((time - (dateHelper.times.first ?? 0))/900 + entry.duration)*slotHeight)
+//                    Spacer().frame(height: 150)
+//                    Color.black.opacity(0.0001)
+//                }
+//                .onTapGesture {
+//                    focusHelper.editingText = false
+//                }
+//            }
         }
         .animation(nil, value: focusHelper.time) // so that it doesn't flow in between entries and mess up taps
     }
@@ -77,6 +80,7 @@ struct DurationEditorView: View {
             .onEnded { _ in
                 lastDragHeight = nil
                 movingStart = nil
+                focusHelper.adjustScroll()
             }
     }
     
@@ -104,6 +108,7 @@ struct DurationEditorView: View {
             .onEnded { _ in
                 lastDragHeight = nil
                 movingStart = nil
+                focusHelper.adjustScroll()
             }
     }
     

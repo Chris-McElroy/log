@@ -31,7 +31,9 @@ struct MainView: View {
                         .frame(height: focusHelper.stats ? nil : 0)
                         .opacity(focusHelper.stats ? 1 : 0)
                     dayTitle
+#if os(iOS)
                     Spacer().frame(height: focusHelper.stats ? 100 : 0)
+#endif
                     entriesList
                         .frame(height: focusHelper.stats ? 0 : nil)
                 }
@@ -107,6 +109,9 @@ struct MainView: View {
                         timeList
                         summaryList
                     }
+#if os(iOS)
+                    .padding(.bottom, focusHelper.focus ? 390 : 80)
+#endif
                     DurationEditorView()
                 }
 //                Spacer().frame(height: focusHelper.time == nil ? 80 : 375)
