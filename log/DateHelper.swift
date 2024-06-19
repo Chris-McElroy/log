@@ -175,7 +175,7 @@ class DateHelper: ObservableObject {
         let yesterdayRef = Calendar.current.dateComponents([.year, .month, .day, .weekday], from: yesterday)
         if dateRef == yesterdayRef && times.contains(currentTimeToday + 86400) {
             print("yesterday", currentTimeToday, currentTimeToday + 86400)
-            return currentTimeToday + 86400 // TODO this is off by 15 min somehow
+            return currentTimeToday + 86400
         }
         
         return nil

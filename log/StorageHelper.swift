@@ -120,10 +120,9 @@ class Storage: ObservableObject {
     }
     
     func mergeEntries() {
-        startUpdateTimer()
+        startUpdateTimer() // this keeps it checking for external updates
         guard !entries.isEmpty && entriesDate == DateHelper.main.day else { loadEntries(for: DateHelper.main.day); return }
 
-        
         let day = entriesDate
         let onlineEntries = getEntries(for: day)
             

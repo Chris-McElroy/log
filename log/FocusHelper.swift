@@ -31,8 +31,10 @@ class FocusHelper: ObservableObject {
         }
         newTime = time
         
-        if let old = self.time, Storage.main.entries[old]?.text == promptText {
-            Storage.main.entries[old]?.text = ""
+        if let old = self.time {
+            if Storage.main.entries[old]?.text == promptText {
+                Storage.main.entries[old]?.text = ""
+            }
             Storage.main.mergeEntries()
         }
         if var new = time {

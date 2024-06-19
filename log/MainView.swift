@@ -21,7 +21,6 @@ struct MainView: View {
     @ObservedObject var focusHelper = FocusHelper.main
     @State var updating = false
     @State var colors: [Int: Int] = [:]
-    @State var testtext = "hi i'm some text!" // TODO remove
     
     var body: some View {
         GeometryReader { gr in
