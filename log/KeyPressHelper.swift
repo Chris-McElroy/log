@@ -23,6 +23,7 @@ struct KeyPressHelper: NSViewRepresentable {
         
         override func keyDown(with event: NSEvent) {
             guard event.modifierFlags.isDisjoint(with: [.control, .shift]) else { return }
+            print("got event!", event.modifierFlags.contains(.command), event.characters)
             if event.modifierFlags.contains(.command) {
                 if event.characters == "e" {
                     focusIn()
@@ -42,8 +43,10 @@ struct KeyPressHelper: NSViewRepresentable {
                     } else if event.specialKey == .upArrow || event.specialKey == .backTab {
                         prevEntry()
                     } else if event.specialKey == .rightArrow {
+                        if focusHelper.time != nil { return }
                         dateHelper.changeDay(forward: true)
                     } else if event.specialKey == .leftArrow {
+                        if focusHelper.time != nil { return }
                         dateHelper.changeDay(forward: false)
                     } else if let num = Categories.keyOrder.firstIndex(of: event.characters?.first ?? "k") {
                         guard let time = focusHelper.time, let entry = Storage.main.entries[time] else { return }

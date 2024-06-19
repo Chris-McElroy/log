@@ -75,7 +75,7 @@ struct DurationEditorView: View {
     var tappedBottomArea: some Gesture {
         SpatialTapGesture(count: 1)
             .onEnded { value in
-                var timePoint = (Int(value.location.y/slotHeight) + 1)*900 + time
+                var timePoint = (Int(value.location.y/slotHeight))*900 + time + entry.duration*900
                 while storage.entries[timePoint] == nil {
                     timePoint -= 900
                     if timePoint <= time {

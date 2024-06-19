@@ -205,8 +205,6 @@ class Storage: ObservableObject {
             print("couldn't write", day, error.localizedDescription)
         }
         
-        AppTimer.updateTimes()
-        
         struct EntryInfo: Hashable {
             let time: Int
             let times: Set<Int>

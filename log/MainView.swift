@@ -222,6 +222,7 @@ struct MainView: View {
         }
     }
     
+    // these are necessary because the keypresshelper doesn't work when the text is being edited
     var switchEntryWithDButtons: some View {
         VStack(spacing: 0) {
             Button("previous entry") {
@@ -247,6 +248,7 @@ struct MainView: View {
         }
     }
     
+    // these are necessary because the keypresshelper doesn't work when the text is being edited
     var focusButtons: some View {
         Button("unfocus") {
             if focusHelper.editingText {
