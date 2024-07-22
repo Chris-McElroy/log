@@ -68,25 +68,25 @@ struct Categories {
     static let keyOrder: [Character] =
     [
         "2",    // 0  - hurting
-        "v",    // 1  - arousing
-        "r",    // 2  - relaxing
+        "r",    // 1  - arousing
+        "q",    // 2  - relaxing
         "d",    // 3  - eating
-        "x",    // 4  - exercising
+        "e",    // 4  - exercising
         "k",    // 5  - shopping
         "k",    // 6  - meeting
-        "f",    // 7  - working
+        "c",    // 7  - working
         "z",    // 8  - playing
-        "a",    // 9  - interacting
+        "s",    // 9  - interacting
         "w",    // 10 - traveling
         "k",    // 11 - commuinicating
         "k",    // 12 - configuring
-        "s",    // 13 - tending
-        "e",    // 14 - thinking
-        "q",    // 15 - sleeping
+        "a",    // 13 - tending
+        "f",    // 14 - thinking
+        "v",    // 15 - sleeping
         "3",    // 16 - listening
         "4",    // 17 - consuming
         "1",    // 18 - failing
-        "c",    // 19 - enjoying
+        "x",    // 19 - enjoying
     ]
     
 /* old colors:
