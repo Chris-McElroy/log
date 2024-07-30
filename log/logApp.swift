@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct logApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @State var lastActive: Date? = nil
 #if os(iOS)
     let activeNotification = UIApplication.didBecomeActiveNotification
@@ -44,5 +45,35 @@ struct logApp: App {
                     Storage.main.stopUpdateTimer()
                 }
         }
+    }
+}
+
+
+class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        if let window = NSApplication.shared.windows.first {
+            setupWindow(window)
+        }
+    }
+    
+    func setupWindow(_ window: NSWindow) {
+        // very useful: https://github.com/lukakerr/NSWindowStyles
+//        window.titleVisibility = .hidden
+//        window.titlebarAppearsTransparent = true
+        window.styleMask.remove(.titled)
+//        window.styleMask.insert(.fullSizeContentView)
+//        window.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
+//        window.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
+//        window.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
+//        window.isOpaque = true
+//        window.hasShadow = false
+//        window.level = .floating
+//        window.backgroundColor = NSColor.clear
+//        window.isReleasedWhenClosed = false
+        window.isMovableByWindowBackground = true
+//        window.collectionBehavior = .canJoinAllSpaces
+//        window.titlebarSeparatorStyle = .none
+//        window.ignoresMouseEvents = true // comment this out for clickability (vera's)
+        window.delegate = self
     }
 }
