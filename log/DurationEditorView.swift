@@ -61,6 +61,11 @@ struct DurationEditorView: View {
     var tappedTopArea: some Gesture {
         SpatialTapGesture(count: 1)
             .onEnded { value in
+                if muteTaps {
+                    muteTaps = false
+                    return
+                }
+                if !NSApplication.shared.isActive { return }
                 var timePoint = (Int(value.location.y/slotHeight))*900 + (dateHelper.times.first ?? 0)
                 while storage.entries[timePoint] == nil {
                     timePoint -= 900
@@ -75,6 +80,10 @@ struct DurationEditorView: View {
     var tappedBottomArea: some Gesture {
         SpatialTapGesture(count: 1)
             .onEnded { value in
+                if muteTaps {
+                    muteTaps = false
+                    return
+                }
                 var timePoint = (Int(value.location.y/slotHeight))*900 + time + entry.duration*900
                 while storage.entries[timePoint] == nil {
                     timePoint -= 900

@@ -59,6 +59,10 @@ struct EntrySummaryView: View {
         }
         .background(Color.black)
         .onTapGesture {
+            if muteTaps {
+                muteTaps = false
+                return
+            }
             withAnimation {
                 focusHelper.changeTime(to: time)
             }

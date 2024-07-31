@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+var muteTaps: Bool = false
+
 @main
 struct logApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -56,6 +58,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         }
     }
     
+    func applicationWillBecomeActive(_ notification: Notification) {
+        muteTaps = true
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: false, block: { _ in
+            muteTaps = false
+        })
+    }
+    
     func setupWindow(_ window: NSWindow) {
         // very useful: https://github.com/lukakerr/NSWindowStyles
 //        window.titleVisibility = .hidden
@@ -70,7 +79,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 //        window.level = .floating
 //        window.backgroundColor = NSColor.clear
 //        window.isReleasedWhenClosed = false
-        window.isMovableByWindowBackground = true
+//        window.isMovableByWindowBackground = true
 //        window.collectionBehavior = .canJoinAllSpaces
 //        window.titlebarSeparatorStyle = .none
 //        window.ignoresMouseEvents = true // comment this out for clickability (vera's)
