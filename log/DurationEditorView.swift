@@ -160,51 +160,51 @@ struct DurationEditorView: View {
         }
         return nil
     }
-    
-    func moveEntryStartEarlier(entry: Entry, time: Int) {
-        let newTime = time - 900 // just above the entry start
-        guard storage.entries[newTime]?.isEmpty() == true else { return } // next entry is blank
-        storage.entries[newTime] = entry
-        entry.duration += 1
-        focusHelper.changeStartTime(to: newTime)
-        storage.entries[time] = nil
-#if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-    }
-    
-    func moveEntryStartLater(entry: Entry, time: Int) {
-        let newTime = time + 900 // just below the entry start
-        guard storage.entries[newTime] == nil else { return } // entry was marked nil
-        storage.entries[newTime] = entry
-        entry.duration -= 1
-        focusHelper.changeStartTime(to: newTime)
-        storage.entries[time] = Entry(blank: true)
-#if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-    }
-    
-    func moveEntryEndEarlier(entry: Entry, time: Int) {
-        let nextTime = time + entry.duration*900 - 900 // end of the entry
-        guard storage.entries[nextTime] == nil else { return } // entry was marked nil
-        entry.duration -= 1
-//        focusHelper.adjustScroll()
-        storage.entries[nextTime] = Entry(blank: true)
-#if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-    }
-    
-    func moveEntryEndLater(entry: Entry, time: Int) {
-        let nextTime = time + entry.duration*900 // just below the entry end
-        guard storage.entries[nextTime]?.isEmpty() == true else { return } // next entry is blank
-        entry.duration += 1
-//        focusHelper.adjustScroll()
-        storage.entries[nextTime] = nil
-#if os(iOS)
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-#endif
-    }
 }
 
+func moveEntryStartEarlier(entry: Entry, time: Int) {
+    let newTime = time - 900 // just above the entry start
+    guard Storage.main.entries[newTime]?.isEmpty() == true else { return } // next entry is blank
+    Storage.main.entries[newTime] = entry
+    entry.duration += 1
+    FocusHelper.main.changeStartTime(to: newTime)
+    Storage.main.entries[time] = nil
+#if os(iOS)
+    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+}
+
+func moveEntryStartLater(entry: Entry, time: Int) {
+    let newTime = time + 900 // just below the entry start
+    guard Storage.main.entries[newTime] == nil else { return } // entry was marked nil
+    Storage.main.entries[newTime] = entry
+    entry.duration -= 1
+    FocusHelper.main.changeStartTime(to: newTime)
+    Storage.main.entries[time] = Entry(blank: true)
+#if os(iOS)
+    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+}
+
+func moveEntryEndEarlier(entry: Entry, time: Int) {
+    guard entry.duration > 1 else { moveEntryStartEarlier(entry: entry, time: time); return }
+    let nextTime = time + entry.duration*900 - 900 // end of the entry
+    guard Storage.main.entries[nextTime] == nil else { return } // entry was marked nil
+    entry.duration -= 1
+//        focusHelper.adjustScroll()
+    Storage.main.entries[nextTime] = Entry(blank: true)
+#if os(iOS)
+    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+}
+
+func moveEntryEndLater(entry: Entry, time: Int) {
+    let nextTime = time + entry.duration*900 // just below the entry end
+    guard Storage.main.entries[nextTime]?.isEmpty() == true else { return } // next entry is blank
+    entry.duration += 1
+//        focusHelper.adjustScroll()
+    Storage.main.entries[nextTime] = nil
+#if os(iOS)
+    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
+}

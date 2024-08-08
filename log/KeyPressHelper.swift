@@ -22,8 +22,8 @@ struct KeyPressHelper: NSViewRepresentable {
         override var acceptsFirstResponder: Bool { true }
         
         override func keyDown(with event: NSEvent) {
-            guard event.modifierFlags.isDisjoint(with: [.control, .shift]) else { return }
-            print("got event!", event.modifierFlags.contains(.command), event.characters)
+            guard event.modifierFlags.isDisjoint(with: [.control]) else { return }
+            print("got event!", event.modifierFlags.contains(.command), event.characters ?? "")
             if event.modifierFlags.contains(.command) {
                 if event.characters == "e" {
                     focusIn()
@@ -33,8 +33,9 @@ struct KeyPressHelper: NSViewRepresentable {
                     nextEntry()
                 } else if event.characters == "∂" {
                     prevEntry()
-                } else if event.characters == "s" {
-                    toggleStats()
+                } else if "sßÍ".contains(event.characters?.first ?? "x") {
+                    if focusHelper.time == nil { toggleStats() }
+                    editDuration(with: event.modifierFlags)
                 }
             } else {
                 if !focusHelper.editingText {
@@ -101,9 +102,24 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func toggleStats() {
-            guard focusHelper.time == nil else { return }
             withAnimation {
                 focusHelper.stats.toggle()
+            }
+        }
+        
+        func editDuration(with modifiers: NSEvent.ModifierFlags) {
+            guard let time = FocusHelper.main.time else { return }
+            guard let entry = Storage.main.entries[time] else { return }
+            let option = modifiers.contains(.option)
+            let shift = modifiers.contains(.shift)
+            if        !option && !shift {
+                moveEntryEndLater(entry: entry, time: time)
+            } else if  option && !shift {
+                moveEntryEndEarlier(entry: entry, time: time)
+            } else if !option &&  shift {
+                moveEntryStartLater(entry: entry, time: time)
+            } else if  option &&  shift {
+                moveEntryStartEarlier(entry: entry, time: time)
             }
         }
     }

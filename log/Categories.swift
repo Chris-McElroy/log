@@ -76,11 +76,11 @@ struct Categories {
         "k",    // 6  - meeting
         "c",    // 7  - working
         "z",    // 8  - playing
-        "s",    // 9  - interacting
+        "a",    // 9  - interacting
         "w",    // 10 - traveling
         "k",    // 11 - commuinicating
         "k",    // 12 - configuring
-        "a",    // 13 - tending
+        "s",    // 13 - tending
         "f",    // 14 - thinking
         "v",    // 15 - sleeping
         "3",    // 16 - listening
