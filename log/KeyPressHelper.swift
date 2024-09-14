@@ -70,12 +70,8 @@ struct KeyPressHelper: NSViewRepresentable {
         
         func focusOut() {
             guard !focusHelper.stats else { return }
-            if focusHelper.editingText {
-                focusHelper.editingText = false
-            } else {
-                withAnimation {
-                    focusHelper.changeTime(to: nil)
-                }
+            withAnimation {
+                focusHelper.changeTime(to: nil)
             }
         }
         

@@ -31,12 +31,17 @@ class FocusHelper: ObservableObject {
         }
         newTime = time
         
+        var nextEditingText = editingText
+        
         if let old = self.time {
             if Storage.main.entries[old]?.text == promptText {
                 Storage.main.entries[old]?.text = ""
             }
             Storage.main.mergeEntries()
+        } else {
+            nextEditingText = true
         }
+        
         if var new = time {
             if new == self.time {
                 editingText.toggle()
@@ -53,7 +58,7 @@ class FocusHelper: ObservableObject {
                 withAnimation(animate ? .default : nil) {
                     self.time = new
                     focus = true
-                    editingText = true
+                    editingText = nextEditingText
                 }
                 self.adjustScroll(animate: animate)
                 self.changing = false

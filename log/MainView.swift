@@ -64,6 +64,7 @@ struct MainView: View {
 #endif
         }
         .scrollContentBackground(.hidden)
+        .ignoresSafeArea(.all)
 //        .onAppear(colors) // TODO have colors be linked to the thing to see if that solves this with less delay than the observed object shit. i think it might. and then i think there might be a way to pin everything here or something, idk.
 #if os(iOS)
         .gesture(DragGesture(minimumDistance: 20)
@@ -250,11 +251,21 @@ struct MainView: View {
     
     // these are necessary because the keypresshelper doesn't work when the text is being edited
     var focusButtons: some View {
-        Button("unfocus") {
-            if focusHelper.editingText {
-                focusHelper.editingText = false
+        VStack(spacing: 0) {
+            Button("unfocus") {
+                guard !focusHelper.stats else { return }
+                if focusHelper.editingText {
+                    focusHelper.editingText = false
+                }
             }
+            .keyboardShortcut("e", modifiers: [.command])
+            Button("fully unfocus") {
+                guard !focusHelper.stats else { return }
+                withAnimation {
+                    focusHelper.changeTime(to: nil)
+                }
+            }
+            .keyboardShortcut("e", modifiers: [.command, .option])
         }
-        .keyboardShortcut("e", modifiers: [.command, .option])
     }
 }

@@ -46,7 +46,7 @@ struct logApp: App {
 //                    DateHelper.main.stopTimeSlotTimer()
                     Storage.main.stopUpdateTimer()
                 }
-        }
+        }.windowStyle(.hiddenTitleBar)
     }
 }
 
@@ -68,12 +68,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func setupWindow(_ window: NSWindow) {
         // very useful: https://github.com/lukakerr/NSWindowStyles
 //        window.titleVisibility = .hidden
+//        window.titlebarSeparatorStyle = .none
 //        window.titlebarAppearsTransparent = true
-        window.styleMask.remove(.titled)
+//        window.styleMask.remove(.titled)
+//        window.styleMask.insert(.nonactivatingPanel)
 //        window.styleMask.insert(.fullSizeContentView)
-//        window.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
-//        window.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
-//        window.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
+        window.standardWindowButton(NSWindow.ButtonType.closeButton)?.isHidden = true
+        window.standardWindowButton(NSWindow.ButtonType.miniaturizeButton)?.isHidden = true
+        window.standardWindowButton(NSWindow.ButtonType.zoomButton)?.isHidden = true
 //        window.isOpaque = true
 //        window.hasShadow = false
 //        window.level = .floating
