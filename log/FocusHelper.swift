@@ -70,24 +70,30 @@ class FocusHelper: ObservableObject {
     }
     
     func changeStartTime(to time: Int) {
-        self.time = time
+        withAnimation(.none) {
+            self.time = time
+        }
         adjustScroll()
     }
     
     func adjustScroll(animate: Bool = true) {
+#if os(macOS)
+        return // it was annoying and now it doesn't do anything :)
+#else
         guard let time = time, let entry = Storage.main.entries[time] else { return }
         let bottomTime = time + entry.duration*900
 //        let topDistance = (editingText || editingColors) ? 1 : (editingDuration ? 16 - ((Storage.main.entries[time]?.duration ?? 1))/2 : 5)
 //        let topTime = max(DateHelper.main.times.min() ?? 0, time - topDistance*900)
-#if os(iOS)
+//#if os(iOS)
         let anchorPoint = focus ? UnitPoint.init(x: 0, y: 0.43) : UnitPoint.center
         let anchorTime = bottomTime // focus ? max(DateHelper.main.times.min() ?? 0, time + ((Storage.main.entries[time]?.duration ?? 0) - 3)*900) : time
-#elseif os(macOS)
-        let anchorPoint = UnitPoint.center
-        let anchorTime = bottomTime
-#endif
+//#elseif os(macOS)
+//        let anchorPoint = UnitPoint.center
+//        let anchorTime = bottomTime
+//#endif
         withAnimation(animate ? .default : nil) {
             scrollProxy?.scrollTo(anchorTime, anchor: anchorPoint)
         }
+#endif
     }
 }

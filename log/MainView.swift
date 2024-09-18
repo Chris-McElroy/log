@@ -47,6 +47,7 @@ struct MainView: View {
 #if os(macOS)
                 if focusHelper.editingText {
                     switchEntryWithDButtons.opacity(0)
+                    changeDuration.opacity(0)
                     focusButtons.opacity(0)
                 }
 #elseif os(iOS)
@@ -246,6 +247,44 @@ struct MainView: View {
                 }
             }
             .keyboardShortcut("d", modifiers: [.command])
+        }
+    }
+    
+    
+//        guard let time = FocusHelper.main.time else { return }
+//        guard let entry = Storage.main.entries[time] else { return }
+//        let option = modifiers.contains(.option)
+//        let shift = modifiers.contains(.shift)
+//        if        !option && !shift {
+//            moveEntryEndLater(entry: entry, time: time)
+//        } else if  option && !shift {
+//            moveEntryEndEarlier(entry: entry, time: time)
+//        } else if !option &&  shift {
+//            moveEntryStartLater(entry: entry, time: time)
+//        } else if  option &&  shift {
+//            moveEntryStartEarlier(entry: entry, time: time)
+//        }
+//    }
+    
+    // these are necessary because the keypresshelper doesn't work when the text is being edited
+    var changeDuration: some View {
+        VStack(spacing: 0) {
+            Button("duration start up") {
+                DurationEditor.main.moveStart(up: true)
+            }
+            .keyboardShortcut("s", modifiers: [.command, .option, .shift])
+            Button("duration start down") {
+                DurationEditor.main.moveStart(up: false)
+            }
+            .keyboardShortcut("s", modifiers: [.command, .shift])
+            Button("duration end up") {
+                DurationEditor.main.moveEnd(up: true)
+            }
+            .keyboardShortcut("s", modifiers: [.command, .option])
+            Button("duration end down") {
+                DurationEditor.main.moveEnd(up: false)
+            }
+            .keyboardShortcut("s", modifiers: [.command])
         }
     }
     

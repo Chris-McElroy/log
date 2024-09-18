@@ -23,7 +23,7 @@ struct KeyPressHelper: NSViewRepresentable {
         
         override func keyDown(with event: NSEvent) {
             guard event.modifierFlags.isDisjoint(with: [.control]) else { return }
-            print("got event!", event.modifierFlags.contains(.command), event.characters ?? "")
+//            print("got event!", event.modifierFlags.contains(.command), event.characters ?? "")
             if event.modifierFlags.contains(.command) {
                 if event.characters == "e" {
                     focusIn()
@@ -104,18 +104,16 @@ struct KeyPressHelper: NSViewRepresentable {
         }
         
         func editDuration(with modifiers: NSEvent.ModifierFlags) {
-            guard let time = FocusHelper.main.time else { return }
-            guard let entry = Storage.main.entries[time] else { return }
             let option = modifiers.contains(.option)
             let shift = modifiers.contains(.shift)
             if        !option && !shift {
-                moveEntryEndLater(entry: entry, time: time)
+                DurationEditor.main.moveEnd(up: false)
             } else if  option && !shift {
-                moveEntryEndEarlier(entry: entry, time: time)
+                DurationEditor.main.moveEnd(up: true)
             } else if !option &&  shift {
-                moveEntryStartLater(entry: entry, time: time)
+                DurationEditor.main.moveStart(up: false)
             } else if  option &&  shift {
-                moveEntryStartEarlier(entry: entry, time: time)
+                DurationEditor.main.moveStart(up: true)
             }
         }
     }
