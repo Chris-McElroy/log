@@ -22,6 +22,7 @@ struct EntryFocusView: View {
     var body: some View {
         TextEditor(text: $text)
             .multilineTextAlignment(.leading)
+            .scrollContentBackground(.hidden)
             .focused($isFocused)
             .padding(.all, 8)
             .frame(height: 150)
